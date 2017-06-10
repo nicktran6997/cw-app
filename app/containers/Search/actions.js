@@ -8,9 +8,10 @@ import {
   DEFAULT_ACTION,
 } from './constants';
 
-export const defaultAction = (dispatch) =>
+export const defaultAction = (dispatch, params) =>
   () =>
-    axios.post('http://localhost:3000/studies/search//json', {}).then((data) =>
+    axios.post(`http://localhost:3000/studies/search/${params.query}/json`,
+      params).then((data) =>
       dispatch({
         type: DEFAULT_ACTION,
         data: data.data,

@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import ReactStars from 'react-stars';
+import ReactPaginate from 'react-paginate';
 import { Table, Column, Cell } from 'fixed-data-table';
 import Helmet from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
@@ -16,8 +17,40 @@ import { defaultAction } from './actions';
 
 export class Search extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
+  constructor(props) {
+    super(props);
+    this.page = 0;
+    this.onPageChange = this.onPageChange.bind(this);
+  }
+
   componentWillMount() {
-    this.props.loadDefault();
+    this.props.search(this.getSearchParams());
+  }
+
+  onPageChange(args) {
+    this.page = args.selected;
+    this.props.search(this.getSearchParams());
+  }
+
+  getSearchParams() {
+    return Object.assign({
+      query: '',
+      start: (this.page) * this.props.pageLength,
+      length: this.props.pageLength,
+    });
+  }
+
+  getRowCount() {
+    return (this.props.Search && this.props.Search.rows
+      && this.props.Search.rows.length) || 0;
+  }
+
+  cellForField(field) {
+    return ({ rowIndex, ...props }) => (
+      <Cell {...props}>
+        {this.cellInner(field, this.props.Search.rows[rowIndex])}
+      </Cell>
+    );
   }
 
   cellInner(field, row) {
@@ -35,14 +68,6 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     }
   }
 
-  cellForField(field) {
-    return ({ rowIndex, ...props }) => (
-      <Cell {...props}>
-        {this.cellInner(field, this.props.Search.rows[rowIndex])}
-      </Cell>
-    );
-  }
-
   render() {
     return (
       <SearchWrapper id="search-wrapper">
@@ -54,7 +79,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
         />
         <Table
           rowHeight={50}
-          rowsCount={this.props.Search.total || 0}
+          rowsCount={this.getRowCount()}
           height={600}
           width={1200}
           headerHeight={50}
@@ -90,13 +115,29 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
             width={150}
           />
         </Table>,
+        <ReactPaginate
+          pageCount={Math.floor(this.props.Search.total / 25)}
+          previousLabel={'previous'}
+          nextLabel={'next'}
+          breakLabel={<a href="">...</a>}
+          breakClassName={'break-me'}
+          pageNum={1}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={this.onPageChange}
+          containerClassName={'pagination'}
+          subContainerClassName={'pages pagination'}
+          activeClassName={'active'}
+        />
       </SearchWrapper>
     );
   }
 }
 
 Search.propTypes = {
-  loadDefault: PropTypes.func.isRequired,
+  search: PropTypes.func.isRequired,
+  // query: PropTypes.string,
+  pageLength: PropTypes.number,
   Search: PropTypes.shape({
     total: PropTypes.number,
     rows: PropTypes.arrayOf(PropTypes.shape({
@@ -106,13 +147,18 @@ Search.propTypes = {
   }),
 };
 
+Search.defaultProps = {
+  query: '',
+  pageLength: 25,
+};
+
 const mapStateToProps = createStructuredSelector({
   Search: makeSelectSearch(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    loadDefault: defaultAction(dispatch),
+    search: (params) => defaultAction(dispatch, params)(),
   };
 }
 
