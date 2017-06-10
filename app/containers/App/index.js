@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { Grid, Row } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 
 export default class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -24,7 +24,9 @@ export default class App extends React.PureComponent { // eslint-disable-line re
     return (
       <Grid>
         <Row id="clinwiki-header" className="">
-          <h1><a href="/">Clinwiki</a></h1>
+          <Col md={12}>
+            <h1><a href="/">Clinwiki</a></h1>
+          </Col>
         </Row>
         {React.Children.toArray(this.props.children)}
       </Grid>

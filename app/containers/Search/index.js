@@ -9,7 +9,10 @@ import { connect } from 'react-redux';
 import ReactStars from 'react-stars';
 import ReactPaginate from 'react-paginate';
 import { Table, Column, Cell } from 'fixed-data-table';
+import { Row, Col, Form, FormGroup,
+  FormControl, Button } from 'react-bootstrap';
 import Helmet from 'react-helmet';
+import FontAwesome from 'react-fontawesome';
 import { createStructuredSelector } from 'reselect';
 import SearchWrapper from '../../components/SearchWrapper';
 import makeSelectSearch from './selectors';
@@ -19,22 +22,34 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   constructor(props) {
     super(props);
+    this.query = this.props.query || '';
     this.page = 0;
     this.onPageChange = this.onPageChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this);
   }
 
   componentWillMount() {
-    this.props.search(this.getSearchParams());
+    this.doSearch();
   }
 
   onPageChange(args) {
     this.page = args.selected;
-    this.props.search(this.getSearchParams());
+    this.doSearch();
+  }
+
+  onSubmit(e) {
+    e.preventDefault();
+    this.doSearch();
+  }
+
+  onSearchChange(e) {
+    this.query = e.target.value;
   }
 
   getSearchParams() {
     return Object.assign({
-      query: '',
+      query: this.query,
       start: (this.page) * this.props.pageLength,
       length: this.props.pageLength,
     });
@@ -43,6 +58,10 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
   getRowCount() {
     return (this.props.Search && this.props.Search.rows
       && this.props.Search.rows.length) || 0;
+  }
+
+  doSearch() {
+    this.props.search(this.getSearchParams());
   }
 
   cellForField(field) {
@@ -77,58 +96,85 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
             { name: 'description', content: 'Description of Search' },
           ]}
         />
-        <Table
-          rowHeight={50}
-          rowsCount={this.getRowCount()}
-          height={600}
-          width={1200}
-          headerHeight={50}
-        >
-          <Column
-            header={<Cell>nct_id</Cell>}
-            cell={this.cellForField('nct_id')}
-            width={150}
-          />
-          <Column
-            header={<Cell>rating</Cell>}
-            cell={this.cellForField('rating')}
-            width={150}
-          />
-          <Column
-            header={<Cell>status</Cell>}
-            cell={this.cellForField('status')}
-            width={150}
-          />
-          <Column
-            header={<Cell>title</Cell>}
-            cell={this.cellForField('title')}
-            width={450}
-          />
-          <Column
-            header={<Cell>started</Cell>}
-            cell={this.cellForField('started')}
-            width={150}
-          />
-          <Column
-            header={<Cell>completed</Cell>}
-            cell={this.cellForField('completed')}
-            width={150}
-          />
-        </Table>,
-        <ReactPaginate
-          pageCount={Math.floor(this.props.Search.total / 25)}
-          previousLabel={'previous'}
-          nextLabel={'next'}
-          breakLabel={<a href="">...</a>}
-          breakClassName={'break-me'}
-          pageNum={1}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={this.onPageChange}
-          containerClassName={'pagination'}
-          subContainerClassName={'pages pagination'}
-          activeClassName={'active'}
-        />
+        <Row id="search-controls" style={{ marginBottom: '10px' }}>
+          <Col md={8} id="aggs">
+
+          </Col>
+          <Col md={4} id="query" className="text-right">
+            <Form inline onSubmit={this.onSubmit}>
+              <FormGroup controlId="formInlineEmail">
+                <FormControl type="text" placeholder="Search..." onChange={this.onSearchChange} />
+              </FormGroup>
+              {' '}
+              <Button type="submit">
+                Search
+                {' '}
+                <FontAwesome name="search" />
+              </Button>
+            </Form>
+          </Col>
+        </Row>
+        <Row id="search-main">
+          <Col md={12}>
+            <Table
+              ref={(table) => { this.table = table; }}
+              rowHeight={50}
+              rowsCount={this.getRowCount()}
+              height={400}
+              width={1140}
+              headerHeight={50}
+            >
+              <Column
+                header={<Cell>nct_id</Cell>}
+                cell={this.cellForField('nct_id')}
+                width={125}
+              />
+              <Column
+                header={<Cell>rating</Cell>}
+                cell={this.cellForField('rating')}
+                width={100}
+              />
+              <Column
+                header={<Cell>status</Cell>}
+                cell={this.cellForField('status')}
+                width={150}
+              />
+              <Column
+                header={<Cell>title</Cell>}
+                cell={this.cellForField('title')}
+                width={555}
+              />
+              <Column
+                header={<Cell>started</Cell>}
+                cell={this.cellForField('started')}
+                width={105}
+              />
+              <Column
+                header={<Cell>completed</Cell>}
+                cell={this.cellForField('completed')}
+                width={105}
+              />
+            </Table>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12} className="text-center">
+            <ReactPaginate
+              pageCount={Math.floor(this.props.Search.total / 25)}
+              previousLabel="previous"
+              nextLabel="next"
+              breakLabel={<a href="">...</a>}
+              breakClassName="break-me"
+              pageNum={1}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={15}
+              onPageChange={this.onPageChange}
+              containerClassName="pagination"
+              subContainerClassName="pages pagination"
+              activeClassName="active"
+            />
+          </Col>
+        </Row>
       </SearchWrapper>
     );
   }
@@ -136,7 +182,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
 Search.propTypes = {
   search: PropTypes.func.isRequired,
-  // query: PropTypes.string,
+  query: PropTypes.string,
   pageLength: PropTypes.number,
   Search: PropTypes.shape({
     total: PropTypes.number,
