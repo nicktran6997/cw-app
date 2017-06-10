@@ -6,13 +6,43 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import ReactStars from 'react-stars';
 import { Table, Column, Cell } from 'fixed-data-table';
 import Helmet from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
 import SearchWrapper from '../../components/SearchWrapper';
 import makeSelectSearch from './selectors';
+import { defaultAction } from './actions';
 
 export class Search extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+  componentWillMount() {
+    this.props.loadDefault();
+  }
+
+  cellInner(field, row) {
+    switch (field) {
+      case 'rating':
+        return (
+          <ReactStars
+            count={5}
+            edit={false}
+            value={row[field]}
+          />
+        );
+      default:
+        return row[field];
+    }
+  }
+
+  cellForField(field) {
+    return ({ rowIndex, ...props }) => (
+      <Cell {...props}>
+        {this.cellInner(field, this.props.Search.rows[rowIndex])}
+      </Cell>
+    );
+  }
+
   render() {
     return (
       <SearchWrapper id="search-wrapper">
@@ -24,24 +54,39 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
         />
         <Table
           rowHeight={50}
-          rowsCount={1}
-          height={500}
-          width={1000}
+          rowsCount={this.props.Search.total || 0}
+          height={800}
+          width={1200}
           headerHeight={50}
         >
           <Column
-            header={<Cell>Col 1</Cell>}
-            cell={<Cell>Column 1 static content</Cell>}
+            header={<Cell>nct_id</Cell>}
+            cell={this.cellForField('nct_id')}
             width={150}
           />
           <Column
-            header={<Cell>Col 2</Cell>}
-            cell={<Cell>Another one</Cell>}
+            header={<Cell>rating</Cell>}
+            cell={this.cellForField('rating')}
             width={150}
           />
           <Column
-            header={<Cell>Col 3</Cell>}
-            cell={<Cell>Another one</Cell>}
+            header={<Cell>status</Cell>}
+            cell={this.cellForField('status')}
+            width={150}
+          />
+          <Column
+            header={<Cell>title</Cell>}
+            cell={this.cellForField('title')}
+            width={450}
+          />
+          <Column
+            header={<Cell>started</Cell>}
+            cell={this.cellForField('started')}
+            width={150}
+          />
+          <Column
+            header={<Cell>completed</Cell>}
+            cell={this.cellForField('completed')}
             width={150}
           />
         </Table>,
@@ -51,7 +96,14 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 }
 
 Search.propTypes = {
-  dispatch: PropTypes.func.isRequired,
+  loadDefault: PropTypes.func.isRequired,
+  Search: PropTypes.shape({
+    total: PropTypes.number,
+    rows: PropTypes.arrayOf(PropTypes.shape({
+      nct_id: PropTypes.string,
+      rating: PropTypes.number,
+    })),
+  }),
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -60,7 +112,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch,
+    loadDefault: defaultAction(dispatch),
   };
 }
 
