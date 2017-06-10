@@ -55,7 +55,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
         <Table
           rowHeight={50}
           rowsCount={this.props.Search.total || 0}
-          height={800}
+          height={600}
           width={1200}
           headerHeight={50}
         >
