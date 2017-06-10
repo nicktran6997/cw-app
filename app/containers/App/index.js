@@ -22,6 +22,9 @@ export default class App extends React.PureComponent { // eslint-disable-line re
   render() {
     return (
       <div>
+        <div id="clinwiki-header">
+          <h1><a href="/">Clinwiki</a></h1>
+        </div>
         {React.Children.toArray(this.props.children)}
       </div>
     );

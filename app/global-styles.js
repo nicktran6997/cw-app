@@ -1,4 +1,5 @@
 import { injectGlobal } from 'styled-components';
+import retinaDust from './images/retina_dust.png';
 
 /* eslint no-unused-expressions: 0 */
 injectGlobal`
@@ -17,7 +18,8 @@ injectGlobal`
   }
 
   #app {
-    background-color: #fafafa;
+    background-image: url(${retinaDust});
+    background-repeat: repeat;
     min-height: 100%;
     min-width: 100%;
   }
