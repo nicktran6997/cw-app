@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import ReactStars from 'react-stars';
 import ReactPaginate from 'react-paginate';
 import { Table, Column, Cell } from 'fixed-data-table';
-import { Row, Col, Form, FormGroup, ButtonGroup,
+import { Row, Col, Form, FormGroup, ButtonGroup, Label,
   FormControl, Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import Helmet from 'react-helmet';
 import FontAwesome from 'react-fontawesome';
@@ -18,15 +18,31 @@ import SearchWrapper from '../../components/SearchWrapper';
 import makeSelectSearch from './selectors';
 import { defaultAction } from './actions';
 
+const aggToField = {
+  average_rating: 'average rating',
+  tags: 'tags',
+  overall_status: 'status',
+  study_type: 'type',
+  sponsors: 'sponsors',
+  facility_names: 'facilities',
+  facility_states: 'states',
+  facility_cities: 'cities',
+  start_date: 'start date',
+  completion_date: 'completion date',
+};
+
 export class Search extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
     this.query = this.props.query || '';
+    this.aggs = {};
     this.page = 0;
     this.onPageChange = this.onPageChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.onAggSelected = this.onAggSelected.bind(this);
+    this.onAggRemoved = this.onAggRemoved.bind(this);
   }
 
   componentWillMount() {
@@ -47,12 +63,36 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     this.query = e.target.value;
   }
 
+  onAggSelected(field, key) {
+    if (!this.aggs[field]) {
+      this.aggs[field] = {};
+    }
+    // cast to string to make dates behave for now (idk)
+    this.aggs[field][String(key)] = 1;
+    console.log(this.aggs);
+    this.doSearch();
+  }
+
+  onAggRemoved(field, key) {
+    if (this.aggs[field]) {
+      delete this.aggs[field][key];
+    }
+    this.doSearch();
+  }
+
   getSearchParams() {
     return Object.assign({
       query: this.query,
       start: (this.page) * this.props.pageLength,
       length: this.props.pageLength,
-    });
+    }, this.getAggsObject());
+  }
+
+  getAggsObject() {
+    if (this.aggs) {
+      return { agg_filters: this.aggs };
+    }
+    return {};
   }
 
   getRowCount() {
@@ -72,6 +112,25 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     );
   }
 
+  keyToInner(field, bucketKey) {
+    switch (field) {
+      case 'average_rating':
+        return ({
+          0: '☆☆☆☆☆',
+          1: '★☆☆☆☆',
+          2: '★★☆☆☆',
+          3: '★★★☆☆',
+          4: '★★★★☆',
+          5: '★★★★★',
+        }[bucketKey]);
+      case 'completion_date':
+      case 'start_date':
+        return (new Date(parseInt(bucketKey, 10)).getFullYear());
+      default:
+        return (bucketKey);
+    }
+  }
+
   aggDropdown(field) {
     if (!this.props.Search.aggs) {
       return '';
@@ -80,48 +139,22 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     const buckets = this.props.Search.aggs[field].buckets;
 
     if (this.props.Search.total && buckets) {
-      let keyToMenuItems;
-
-      switch (field) {
-        case 'average_rating':
-          keyToMenuItems = (key) => (
-            <MenuItem key={key}>
-              <ReactStars
-                count={5}
-                edit={false}
-                value={buckets[key].key}
-              />
-              {' '}
-              ({buckets[key].doc_count})
-            </MenuItem>
-          );
-          break;
-        case 'completion_date':
-        case 'start_date':
-          keyToMenuItems = (key) => (
-            <MenuItem key={key}>
-              {new Date(buckets[key].key).getFullYear()}
-              {' '}
-              ({buckets[key].doc_count})
-            </MenuItem>
-          );
-          break;
-        default:
-          keyToMenuItems = (key) => (
-            <MenuItem key={key}>
-              {buckets[key].key}
-              {' '}
-              ({buckets[key].doc_count})
-            </MenuItem>
-          );
-      }
-      menuItems = Object.keys(buckets).map(keyToMenuItems);
+      menuItems = Object.keys(buckets).map((key) => (
+        <MenuItem
+          key={key}
+          onSelect={() => this.onAggSelected(field, buckets[key].key)}
+        >
+          {this.keyToInner(field, buckets[key].key)}
+          {' '}
+          ({buckets[key].doc_count})
+        </MenuItem>
+      ));
     }
 
     return (
       <DropdownButton
         bsStyle="default"
-        title={field}
+        title={<b>{aggToField[field]}</b>}
         key={field}
         id={`dropdown-basic-${field}`}
       >
@@ -143,6 +176,27 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
       default:
         return row[field];
     }
+  }
+
+  searchFilters() {
+    const searchFilters = [];
+    Object.keys(this.aggs).forEach((field) => {
+      if (this.aggs[field]) {
+        Object.keys(this.aggs[field]).forEach((key) => {
+          searchFilters.push(
+            <Label style={{ marginRight: '5px' }} key={key}>
+              {aggToField[field]}: {this.keyToInner(field, key)}
+              {' '}
+              <FontAwesome
+                style={{ cursor: 'pointer', color: '#cc1111' }}
+                name="remove"
+                onClick={() => this.onAggRemoved(field, key)}
+              />
+            </Label>);
+        });
+      }
+    });
+    return searchFilters;
   }
 
   render() {
@@ -191,6 +245,11 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
                 <FontAwesome name="search" />
               </Button>
             </Form>
+          </Col>
+        </Row>
+        <Row id="search-filters" style={{ height: '15px', marginBottom: '10px' }}>
+          <Col md={12}>
+            {this.searchFilters()}
           </Col>
         </Row>
         <Row id="search-main">
