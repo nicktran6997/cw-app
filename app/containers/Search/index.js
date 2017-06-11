@@ -38,11 +38,13 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     this.query = this.props.query || '';
     this.aggs = {};
     this.page = 0;
+    this.sorts = {};
     this.onPageChange = this.onPageChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
     this.onAggSelected = this.onAggSelected.bind(this);
     this.onAggRemoved = this.onAggRemoved.bind(this);
+    this.toggleSort = this.toggleSort.bind(this);
   }
 
   componentWillMount() {
@@ -69,7 +71,6 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     }
     // cast to string to make dates behave for now (idk)
     this.aggs[field][String(key)] = 1;
-    console.log(this.aggs);
     this.doSearch();
   }
 
@@ -81,16 +82,24 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
   }
 
   getSearchParams() {
-    return Object.assign({
+    const searchParams = Object.assign({
       query: this.query,
       start: (this.page) * this.props.pageLength,
       length: this.props.pageLength,
-    }, this.getAggsObject());
+    }, this.getAggsObject(), this.getSortsObject());
+    return searchParams;
   }
 
   getAggsObject() {
     if (this.aggs) {
       return { agg_filters: this.aggs };
+    }
+    return {};
+  }
+
+  getSortsObject() {
+    if (this.sorts) {
+      return { sort: this.sorts };
     }
     return {};
   }
@@ -106,7 +115,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   cellForField(field) {
     return ({ rowIndex, ...props }) => (
-      <Cell {...props}>
+      <Cell {...props} className="text-center">
         {this.cellInner(field, this.props.Search.rows[rowIndex])}
       </Cell>
     );
@@ -199,6 +208,36 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     return searchFilters;
   }
 
+  headerCell(field, passedKey = null) {
+    const key = passedKey || field;
+    return (
+      <Cell className="text-center">
+        {field}
+        {' '}
+        <FontAwesome
+          name={`sort${this.sorts[key] ? `-${this.sorts[key]}` : ''}`}
+          onClick={() => this.toggleSort(key)}
+          style={{ cursor: 'pointer' }}
+        />
+      </Cell>
+    );
+  }
+
+  toggleSort(field) {
+    switch (this.sorts[field]) {
+      case 'asc':
+        this.sorts[field] = 'desc';
+        break;
+      case 'desc':
+        delete this.sorts[field];
+        break;
+      default:
+        this.sorts[field] = 'asc';
+        break;
+    }
+    this.doSearch();
+  }
+
   render() {
     return (
       <SearchWrapper id="search-wrapper">
@@ -263,32 +302,32 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
               headerHeight={50}
             >
               <Column
-                header={<Cell>nct_id</Cell>}
+                header={this.headerCell('nct_id')}
                 cell={this.cellForField('nct_id')}
                 width={125}
               />
               <Column
-                header={<Cell>rating</Cell>}
+                header={this.headerCell('rating', 'average_rating')}
                 cell={this.cellForField('rating')}
                 width={100}
               />
               <Column
-                header={<Cell>status</Cell>}
+                header={this.headerCell('status', 'overall_status')}
                 cell={this.cellForField('status')}
                 width={150}
               />
               <Column
-                header={<Cell>title</Cell>}
+                header={this.headerCell('title', 'brief_title')}
                 cell={this.cellForField('title')}
                 width={555}
               />
               <Column
-                header={<Cell>started</Cell>}
+                header={this.headerCell('started', 'start_date')}
                 cell={this.cellForField('started')}
                 width={105}
               />
               <Column
-                header={<Cell>completed</Cell>}
+                header={this.headerCell('completed', 'completion_date')}
                 cell={this.cellForField('completed')}
                 width={105}
               />
