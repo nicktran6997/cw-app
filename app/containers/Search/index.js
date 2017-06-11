@@ -9,8 +9,8 @@ import { connect } from 'react-redux';
 import ReactStars from 'react-stars';
 import ReactPaginate from 'react-paginate';
 import { Table, Column, Cell } from 'fixed-data-table';
-import { Row, Col, Form, FormGroup,
-  FormControl, Button } from 'react-bootstrap';
+import { Row, Col, Form, FormGroup, ButtonGroup,
+  FormControl, Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import Helmet from 'react-helmet';
 import FontAwesome from 'react-fontawesome';
 import { createStructuredSelector } from 'reselect';
@@ -72,6 +72,64 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     );
   }
 
+  aggDropdown(field) {
+    if (!this.props.Search.aggs) {
+      return '';
+    }
+    let menuItems = '';
+    const buckets = this.props.Search.aggs[field].buckets;
+
+    if (this.props.Search.total && buckets) {
+      let keyToMenuItems;
+
+      switch (field) {
+        case 'average_rating':
+          keyToMenuItems = (key) => (
+            <MenuItem key={key}>
+              <ReactStars
+                count={5}
+                edit={false}
+                value={buckets[key].key}
+              />
+              {' '}
+              ({buckets[key].doc_count})
+            </MenuItem>
+          );
+          break;
+        case 'completion_date':
+        case 'start_date':
+          keyToMenuItems = (key) => (
+            <MenuItem key={key}>
+              {new Date(buckets[key].key).getFullYear()}
+              {' '}
+              ({buckets[key].doc_count})
+            </MenuItem>
+          );
+          break;
+        default:
+          keyToMenuItems = (key) => (
+            <MenuItem key={key}>
+              {buckets[key].key}
+              {' '}
+              ({buckets[key].doc_count})
+            </MenuItem>
+          );
+      }
+      menuItems = Object.keys(buckets).map(keyToMenuItems);
+    }
+
+    return (
+      <DropdownButton
+        bsStyle="default"
+        title={field}
+        key={field}
+        id={`dropdown-basic-${field}`}
+      >
+        {menuItems}
+      </DropdownButton>
+    );
+  }
+
   cellInner(field, row) {
     switch (field) {
       case 'rating':
@@ -98,7 +156,28 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
         />
         <Row id="search-controls" style={{ marginBottom: '10px' }}>
           <Col md={8} id="aggs">
-
+            <Row>
+              <Col md={12}>
+                <ButtonGroup justified>
+                  {this.aggDropdown('average_rating')}
+                  {this.aggDropdown('tags')}
+                  {this.aggDropdown('overall_status')}
+                  {this.aggDropdown('study_type')}
+                  {this.aggDropdown('sponsors')}
+                </ButtonGroup>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <ButtonGroup justified>
+                  {this.aggDropdown('facility_names')}
+                  {this.aggDropdown('facility_states')}
+                  {this.aggDropdown('facility_cities')}
+                  {this.aggDropdown('start_date')}
+                  {this.aggDropdown('completion_date')}
+                </ButtonGroup>
+              </Col>
+            </Row>
           </Col>
           <Col md={4} id="query" className="text-right">
             <Form inline onSubmit={this.onSubmit}>
@@ -186,10 +265,8 @@ Search.propTypes = {
   pageLength: PropTypes.number,
   Search: PropTypes.shape({
     total: PropTypes.number,
-    rows: PropTypes.arrayOf(PropTypes.shape({
-      nct_id: PropTypes.string,
-      rating: PropTypes.number,
-    })),
+    aggs: PropTypes.shape({}),
+    rows: PropTypes.arrayOf(PropTypes.shape({})),
   }),
 };
 

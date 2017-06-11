@@ -17,7 +17,8 @@ function searchReducer(state = initialState, action) {
       return state
         .set('total', action.data.recordsTotal)
         .set('totalFiltered', action.data.recordsFiltered)
-        .set('rows', action.data.data);
+        .set('rows', action.data.data)
+        .set('aggs', action.data.aggs);
     default:
       return state;
   }
