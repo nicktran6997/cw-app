@@ -76,6 +76,24 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/login-signup',
+      name: 'loginSignup',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/LoginSignup/reducer'),
+          import('containers/LoginSignup'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, component]) => {
+          injectReducer('loginSignup', reducer.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {

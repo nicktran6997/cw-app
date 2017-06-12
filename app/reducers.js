@@ -37,11 +37,23 @@ function routeReducer(state = routeInitialState, action) {
   }
 }
 
+const authInitialState = fromJS({
+  loggedIn: false,
+});
+
+function authReducer(state = authInitialState, action) {
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+
 /**
  * Creates the main reducer with the asynchronously loaded ones
  */
 export default function createReducer(asyncReducers) {
   return combineReducers({
+    auth: authReducer,
     route: routeReducer,
     language: languageProviderReducer,
     ...asyncReducers,

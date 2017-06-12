@@ -10,6 +10,8 @@ import Helmet from 'react-helmet';
 import ReactStars from 'react-stars';
 import { Row, Col, Tabs, Tab, Table, Well } from 'react-bootstrap';
 import { createStructuredSelector } from 'reselect';
+import AuthButton from '../../components/AuthButton';
+import { makeSelectAuthState } from '../App/selectors';
 import makeSelectStudy from './selectors';
 import * as actions from './actions';
 
@@ -143,6 +145,14 @@ export class Study extends React.Component {
             { name: 'description', content: 'Description of Study' },
           ]}
         />
+        <Row id="clinwiki-header" className="">
+          <Col md={8}>
+            <h1><a href="/">Clinwiki</a></h1>
+          </Col>
+          <Col md={4} className="text-right">
+            <AuthButton {...this.props.Auth} />
+          </Col>
+        </Row>
         <Row>
           <StudySidenav {...this.props.Study.study} />
           <Col md={9} id="study-main">
@@ -166,12 +176,14 @@ export class Study extends React.Component {
 
 Study.propTypes = {
   Study: PropTypes.object,
+  Auth: PropTypes.object,
   getStudy: PropTypes.func.isRequired,
   params: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({
   Study: makeSelectStudy(),
+  Auth: makeSelectAuthState(),
 });
 
 function mapDispatchToProps(dispatch) {
