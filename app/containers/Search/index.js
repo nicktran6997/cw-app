@@ -6,6 +6,7 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 import ReactStars from 'react-stars';
 import ReactPaginate from 'react-paginate';
 import { Table, Column, Cell } from 'fixed-data-table';
@@ -35,7 +36,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   constructor(props) {
     super(props);
-    this.query = this.props.query || '';
+    this.query = this.props.params.query || '';
     this.aggs = {};
     this.page = 0;
     this.sorts = {};
@@ -51,6 +52,13 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     this.doSearch();
   }
 
+  componentWillReceiveProps(props) {
+    this.query = props.params.query || '';
+    this.aggs = {};
+    this.page = 0;
+    this.sorts = {};
+  }
+
   onPageChange(args) {
     this.page = args.selected;
     this.doSearch();
@@ -59,6 +67,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
   onSubmit(e) {
     e.preventDefault();
     this.doSearch();
+    this.props.router.push(`/search/${this.query}`);
   }
 
   onSearchChange(e) {
@@ -182,6 +191,9 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
             value={row[field]}
           />
         );
+      case 'nct_id':
+      case 'title':
+        return <Link to={`/study/${row.nct_id}`}>{row[field]}</Link>;
       default:
         return row[field];
     }
@@ -275,7 +287,11 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
           <Col md={4} id="query" className="text-right">
             <Form inline onSubmit={this.onSubmit}>
               <FormGroup controlId="formInlineEmail">
-                <FormControl type="text" placeholder="Search..." onChange={this.onSearchChange} />
+                <FormControl
+                  type="text"
+                  placeholder={this.props.params.query || 'Search...'}
+                  onChange={this.onSearchChange}
+                />
               </FormGroup>
               {' '}
               <Button type="submit">
@@ -361,6 +377,8 @@ Search.propTypes = {
   search: PropTypes.func.isRequired,
   query: PropTypes.string,
   pageLength: PropTypes.number,
+  router: PropTypes.object,
+  params: PropTypes.object,
   Search: PropTypes.shape({
     total: PropTypes.number,
     aggs: PropTypes.shape({}),

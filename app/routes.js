@@ -22,19 +22,23 @@ export default function createRoutes(store) {
       name: 'home',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/HomePage'),
+          import('containers/Search/reducer'),
+          import('containers/Search/sagas'),
+          import('containers/Search'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([component]) => {
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('search', reducer.default);
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 
         importModules.catch(errorLoading);
       },
     }, {
-      path: '/search',
+      path: '/search/:query',
       name: 'search',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -48,6 +52,24 @@ export default function createRoutes(store) {
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('search', reducer.default);
           injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/study/:nctId',
+      name: 'study',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Study/reducer'),
+          import('containers/Study'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, component]) => {
+          injectReducer('study', reducer.default);
           renderRoute(component);
         });
 
