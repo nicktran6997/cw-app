@@ -14,5 +14,10 @@ export const defaultAction = (dispatch, params) =>
       params).then((data) =>
       dispatch({
         type: DEFAULT_ACTION,
-        data: data.data,
+        data: Object.assign(data.data, {
+          query: params.query,
+          page: params.page,
+          aggsSent: params.agg_filters,
+          sorts: params.sorts,
+        }),
       }));

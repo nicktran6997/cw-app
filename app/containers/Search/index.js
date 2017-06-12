@@ -36,10 +36,10 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   constructor(props) {
     super(props);
-    this.query = this.props.params.query || '';
-    this.aggs = {};
-    this.page = 0;
-    this.sorts = {};
+    this.query = this.props.Search.query || this.props.params.query || '';
+    this.aggs = this.props.Search.aggsSent || {};
+    this.page = this.props.Search.page || 0;
+    this.sorts = this.props.Search.sorts || {};
     this.onPageChange = this.onPageChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
@@ -49,14 +49,18 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
   }
 
   componentWillMount() {
-    this.doSearch();
+    if (this.query !== this.props.Search.query) {
+      this.doSearch();
+    }
   }
 
   componentWillReceiveProps(props) {
     this.query = props.params.query || '';
-    this.aggs = {};
-    this.page = 0;
-    this.sorts = {};
+    if (this.query !== this.props.Search.query) {
+      this.aggs = {};
+      this.page = 0;
+      this.sorts = {};
+    }
   }
 
   onPageChange(args) {
@@ -80,6 +84,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     }
     // cast to string to make dates behave for now (idk)
     this.aggs[field][String(key)] = 1;
+    this.page = 0;
     this.doSearch();
   }
 
@@ -95,6 +100,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
       query: this.query,
       start: (this.page) * this.props.pageLength,
       length: this.props.pageLength,
+      page: this.page,
     }, this.getAggsObject(), this.getSortsObject());
     return searchParams;
   }
@@ -380,8 +386,12 @@ Search.propTypes = {
   router: PropTypes.object,
   params: PropTypes.object,
   Search: PropTypes.shape({
+    page: PropTypes.number,
+    query: PropTypes.string,
     total: PropTypes.number,
     aggs: PropTypes.shape({}),
+    aggsSent: PropTypes.shape({}),
+    sorts: PropTypes.shape({}),
     rows: PropTypes.arrayOf(PropTypes.shape({})),
   }),
 };
