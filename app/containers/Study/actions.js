@@ -15,7 +15,8 @@ import {
 
 export const defaultAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/json`).then((data) =>
+    axios.get(`http://localhost:3000/studies/${nctId}/json`, { withCredentials: true })
+    .then((data) =>
       dispatch({
         type: DEFAULT_ACTION,
         data: data.data,
@@ -23,7 +24,8 @@ export const defaultAction = (dispatch, nctId) =>
 
 export const crowdAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/crowd`).then((data) =>
+    axios.get(`http://localhost:3000/studies/${nctId}/crowd`, { withCredentials: true })
+    .then((data) =>
       dispatch({
         type: CROWD_ACTION,
         data: data.data,
@@ -31,7 +33,8 @@ export const crowdAction = (dispatch, nctId) =>
 
 export const trackingAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/tracking`).then((data) =>
+    axios.get(`http://localhost:3000/studies/${nctId}/tracking`, { withCredentials: true })
+    .then((data) =>
       dispatch({
         type: TRACKING_ACTION,
         data: data.data,
@@ -39,7 +42,8 @@ export const trackingAction = (dispatch, nctId) =>
 
 export const descriptiveAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/descriptive`).then((data) =>
+    axios.get(`http://localhost:3000/studies/${nctId}/descriptive`, { withCredentials: true })
+    .then((data) =>
       dispatch({
         type: DESCRIPTIVE_ACTION,
         data: data.data,
@@ -47,7 +51,8 @@ export const descriptiveAction = (dispatch, nctId) =>
 
 export const adminAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/administrative`).then((data) =>
+    axios.get(`http://localhost:3000/studies/${nctId}/administrative`, { withCredentials: true })
+    .then((data) =>
       dispatch({
         type: ADMINISTRATIVE_ACTION,
         data: data.data,
@@ -55,7 +60,8 @@ export const adminAction = (dispatch, nctId) =>
 
 export const recruitmentAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/recruitment`).then((data) =>
+    axios.get(`http://localhost:3000/studies/${nctId}/recruitment`, { withCredentials: true })
+    .then((data) =>
       dispatch({
         type: RECRUITMENT_ACTION,
         data: data.data,

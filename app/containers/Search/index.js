@@ -260,7 +260,6 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   render() {
     return (
-
       <SearchWrapper id="search-wrapper">
         <Helmet
           title="Search"
@@ -420,7 +419,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    search: (params) => defaultAction(dispatch, params)(),
+    search: defaultAction(dispatch),
   };
 }
 
