@@ -142,15 +142,18 @@ export class Study extends React.Component {
     this.tabs = defaultTabs;
   }
 
-  onTagSubmit(e) {
+  onTagSubmit(e, newTag) {
     e.preventDefault();
-    // console.log(e);
-    // this.props.submitTagAction(this.props.params.nctId, )
+    if (newTag) {
+      this.props.onTagSubmit(this.props.params.nctId, newTag)
+        .then(this.props.reload(this.props.params.nctId));
+    }
   }
 
-  onTagRemove(e) {
+  onTagRemove(e, tagId) {
     e.preventDefault();
-    // TODO
+    this.props.onTagRemove(this.props.params.nctId, tagId)
+      .then(this.props.reload(this.props.params.nctId));
   }
 
   getStudyTabs() {
@@ -200,8 +203,8 @@ export class Study extends React.Component {
           <StudySidenav
             {...this.props.Study.study}
             loggedIn={this.props.Auth.loggedIn}
-            onTagSubmit={this.props.onTagSubmit}
-            onTagRemove={this.props.onTagRemove}
+            onTagSubmit={this.onTagSubmit}
+            onTagRemove={this.onTagRemove}
           />
           <Col md={9} id="study-main">
             <Row>
@@ -229,6 +232,7 @@ Study.propTypes = {
   params: PropTypes.object,
   onTagSubmit: PropTypes.func.isRequired,
   onTagRemove: PropTypes.func.isRequired,
+  reload: PropTypes.func.isRequired,
 };
 
 Study.defaultProps = {
@@ -242,6 +246,7 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
+    reload: (nctId) => actions.defaultAction(dispatch, nctId),
     getStudy: (nctId) => Promise.all([
       actions.defaultAction(dispatch, nctId)(),
       actions.crowdAction(dispatch, nctId)(),

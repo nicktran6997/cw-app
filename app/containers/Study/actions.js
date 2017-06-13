@@ -70,15 +70,15 @@ export const recruitmentAction = (dispatch, nctId) =>
       }));
 
 export const removeTagAction = (dispatch) =>
-  (tagId) =>
-    client.delete(`/tags/${tagId}`)
+  (nctId, tagId) =>
+    client.delete(`/tags/${tagId}`, { nct_id: nctId })
     .then(() => dispatch({
       type: TAG_REMOVE_ACTION,
     }));
 
 export const submitTagAction = (dispatch) =>
   (nctId, newTag) =>
-    client.post('/tag', {
+    client.post('/tags', {
       nct_id: nctId,
       new_tag: newTag,
     }).then((data) => dispatch({
