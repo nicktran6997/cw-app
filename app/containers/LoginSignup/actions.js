@@ -4,7 +4,7 @@
  *
  */
 
-import axios from 'axios';
+import client from '../../utils/client';
 import {
   DEFAULT_ACTION,
   SIGNUP_ACTION,
@@ -24,7 +24,7 @@ export function defaultAction() {
 
 export const loginAction = (dispatch) =>
   (params) =>
-    axios.post('http://localhost:3000/users/sign_in', Object.assign({ withCredentials: true }, params))
+    client.post('/users/sign_in', params)
       .catch((errors) => dispatch({
         type: LOGIN_ERRORS_ACTION,
         data: errors,
@@ -36,7 +36,7 @@ export const loginAction = (dispatch) =>
 
 export const signupAction = (dispatch) =>
   (params) =>
-    axios.post('http://localhost:3000/users', Object.assign({ withCredentials: true }, params))
+    client.post('/users', params)
       .catch((error) => {
         dispatch({
           type: SIGNUP_ERRORS_ACTION,
@@ -50,7 +50,7 @@ export const signupAction = (dispatch) =>
 
 export const logoutAction = (dispatch) =>
   () =>
-    axios.delete('http://localhost:3000/users/session')
+    client.delete('/users/sign_out')
       .catch((error) => {
         dispatch({
           type: LOGOUT_ERRORS_ACTION,
@@ -64,7 +64,7 @@ export const logoutAction = (dispatch) =>
 
 export const sessionExistsAction = (dispatch) =>
   () =>
-    axios.get('http://localhost:3000/user/exists', { withCredentials: true })
+    client.get('/user/exists')
       .catch(() => ({ data: { isLoggedIn: false } }))
       .then((data) => dispatch({
         type: IS_LOGGED_IN_ACTION,

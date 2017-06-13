@@ -17,7 +17,7 @@ const AuthButton = (props) => {
   }
   return (
     <div style={{ marginTop: '10px' }}>
-      <DropdownButton title={props.email} id="loggedIn">
+      <DropdownButton title={props.email || ''} id="loggedIn">
         <MenuItem href="/logout">Log Out</MenuItem>
       </DropdownButton>
     </div>

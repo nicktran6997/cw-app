@@ -10,3 +10,5 @@ export const DESCRIPTIVE_ACTION = 'app/Study/DESCRIPTIVE_ACTION';
 export const ADMINISTRATIVE_ACTION = 'app/Study/ADMIN_ACTION';
 export const RECRUITMENT_ACTION = 'app/Study/RECRUITMENT_ACTION';
 export const TRACKING_ACTION = 'app/Study/TRACKING_ACTION';
+export const TAG_SUBMIT_ACTION = 'app/Study/TAG_SUBMIT_ACTION';
+export const TAG_REMOVE_ACTION = 'app/Study/TAG_REMOVE_ACTION';

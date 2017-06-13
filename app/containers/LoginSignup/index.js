@@ -23,6 +23,9 @@ export class LoginSignup extends React.Component { // eslint-disable-line react/
     this.handleLogin = this.handleLogin.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
     this.handleRecoverPassword = this.handleRecoverPassword.bind(this);
+    if (props.route.path === '/logout') {
+      props.logout().then(() => props.router.push('/'));
+    }
   }
 
   componentWillReceiveProps(props) {
@@ -40,8 +43,8 @@ export class LoginSignup extends React.Component { // eslint-disable-line react/
           icon: <FontAwesome name="warning" />,
         });
     }
-    if (props.location.pathName === '/logout') {
-      this.logout().then(() => this.props.router.push('/login-signup'));
+    if (props.route.path === '/logout') {
+      props.logout().then(() => this.props.router.push('/login-signup'));
     }
   }
 
@@ -66,8 +69,8 @@ export class LoginSignup extends React.Component { // eslint-disable-line react/
   }
 
   handleRecoverPassword(params) {
-    console.log(params);
-    console.log('todo');
+    // todo
+    return params;
   }
 
   render() {
@@ -102,7 +105,9 @@ export class LoginSignup extends React.Component { // eslint-disable-line react/
 LoginSignup.propTypes = {
   login: PropTypes.func.isRequired,
   signup: PropTypes.func.isRequired,
+  route: PropTypes.object,
   router: PropTypes.object,
+  logout: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({

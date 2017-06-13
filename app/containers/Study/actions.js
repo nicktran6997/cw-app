@@ -3,7 +3,7 @@
  * Study actions
  *
  */
-import axios from 'axios';
+import client from '../../utils/client';
 import {
   DEFAULT_ACTION,
   CROWD_ACTION,
@@ -11,11 +11,13 @@ import {
   DESCRIPTIVE_ACTION,
   ADMINISTRATIVE_ACTION,
   RECRUITMENT_ACTION,
+  TAG_REMOVE_ACTION,
+  TAG_SUBMIT_ACTION,
 } from './constants';
 
 export const defaultAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/json`, { withCredentials: true })
+    client.get(`/studies/${nctId}/json`)
     .then((data) =>
       dispatch({
         type: DEFAULT_ACTION,
@@ -24,7 +26,7 @@ export const defaultAction = (dispatch, nctId) =>
 
 export const crowdAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/crowd`, { withCredentials: true })
+    client.get(`/studies/${nctId}/crowd`)
     .then((data) =>
       dispatch({
         type: CROWD_ACTION,
@@ -33,7 +35,7 @@ export const crowdAction = (dispatch, nctId) =>
 
 export const trackingAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/tracking`, { withCredentials: true })
+    client.get(`/studies/${nctId}/tracking`)
     .then((data) =>
       dispatch({
         type: TRACKING_ACTION,
@@ -42,7 +44,7 @@ export const trackingAction = (dispatch, nctId) =>
 
 export const descriptiveAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/descriptive`, { withCredentials: true })
+    client.get(`/studies/${nctId}/descriptive`)
     .then((data) =>
       dispatch({
         type: DESCRIPTIVE_ACTION,
@@ -51,7 +53,7 @@ export const descriptiveAction = (dispatch, nctId) =>
 
 export const adminAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/administrative`, { withCredentials: true })
+    client.get(`/studies/${nctId}/administrative`)
     .then((data) =>
       dispatch({
         type: ADMINISTRATIVE_ACTION,
@@ -60,9 +62,26 @@ export const adminAction = (dispatch, nctId) =>
 
 export const recruitmentAction = (dispatch, nctId) =>
   () =>
-    axios.get(`http://localhost:3000/studies/${nctId}/recruitment`, { withCredentials: true })
+    client.get(`/studies/${nctId}/recruitment`)
     .then((data) =>
       dispatch({
         type: RECRUITMENT_ACTION,
         data: data.data,
       }));
+
+export const removeTagAction = (dispatch) =>
+  (tagId) =>
+    client.delete(`/tags/${tagId}`)
+    .then(() => dispatch({
+      type: TAG_REMOVE_ACTION,
+    }));
+
+export const submitTagAction = (dispatch) =>
+  (nctId, newTag) =>
+    client.post('/tag', {
+      nct_id: nctId,
+      new_tag: newTag,
+    }).then((data) => dispatch({
+      type: TAG_SUBMIT_ACTION,
+      data: data.data,
+    }));
