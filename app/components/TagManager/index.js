@@ -46,6 +46,7 @@ class TagManager extends React.Component {
               this.props.loggedIn ?
                 <FontAwesome
                   name="remove"
+                  style={{ cursor: 'pointer' }}
                   onClick={(e) => this.onTagRemove(e, tag.id)}
                 />
                 : null

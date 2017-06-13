@@ -120,6 +120,63 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/review/:nctId',
+      name: 'review',
+      onEnter: isLoggedIn,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Study/reducer'),
+          import('containers/Study'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, component]) => {
+          injectReducer('study', reducer.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/review/:nctId/edit/:reviewId',
+      name: 'review',
+      onEnter: isLoggedIn,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Study/reducer'),
+          import('containers/Study'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, component]) => {
+          injectReducer('study', reducer.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reviews/:nctId',
+      name: 'reviews',
+      onEnter: isLoggedIn,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Study/reducer'),
+          import('containers/Study'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, component]) => {
+          injectReducer('study', reducer.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {

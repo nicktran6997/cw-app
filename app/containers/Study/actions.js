@@ -13,6 +13,11 @@ import {
   RECRUITMENT_ACTION,
   TAG_REMOVE_ACTION,
   TAG_SUBMIT_ACTION,
+  REVIEW_SUBMIT_ACTION,
+  REVIEW_UPDATE_ACTION,
+  REVIEWS_RECEIVE_ACTION,
+  REVIEW_RECEIVE_ACTION,
+  REVIEW_DELETE_ACTION,
 } from './constants';
 
 export const defaultAction = (dispatch, nctId) =>
@@ -85,3 +90,42 @@ export const submitTagAction = (dispatch) =>
       type: TAG_SUBMIT_ACTION,
       data: data.data,
     }));
+
+export const submitReviewAction = (dispatch) =>
+  (nctId, comment, rating) =>
+    client.post('/reviews.json', { nct_id: nctId, comment, rating })
+    .then(() =>
+      dispatch({
+        type: REVIEW_SUBMIT_ACTION,
+      }));
+
+export const updateReviewAction = (dispatch) =>
+  (reviewId, comment, rating) =>
+    client.patch(`/reviews/${reviewId}.json`, { comment, rating })
+    .then(() =>
+      dispatch({
+        type: REVIEW_UPDATE_ACTION,
+      }));
+
+export const reviewsAction = (dispatch, nctId) =>
+  () =>
+    client.get(`reviews.json?nct_id=${nctId}`)
+      .then((data) => dispatch({
+        type: REVIEWS_RECEIVE_ACTION,
+        data: data.data,
+      }));
+
+export const getReviewAction = (dispatch) =>
+  (reviewId) =>
+    client.get(`reviews/${reviewId}`)
+      .then((data) => dispatch({
+        type: REVIEW_RECEIVE_ACTION,
+        data: data.data,
+      }));
+
+export const deleteReviewAction = (dispatch) =>
+  (reviewId) =>
+    client.delete(`reviews/${reviewId}.json`)
+      .then(() => dispatch({
+        type: REVIEW_DELETE_ACTION,
+      }));

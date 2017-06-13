@@ -1,17 +1,14 @@
-/*
- *
- * Study
- *
- */
-
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import ReactStars from 'react-stars';
-import { Row, Col, Tabs, Tab, Table, Well, Button } from 'react-bootstrap';
+import { Row, Col, Tabs, Tab, Well } from 'react-bootstrap';
 import { createStructuredSelector } from 'reselect';
 import AuthButton from '../../components/AuthButton';
-import TagManager from '../../components/TagManager';
+import StudySidenav from '../../components/StudySidenav';
+import CrowdTab from '../../components/CrowdTab';
+import StudyTab from '../../components/StudyTab';
+import ReviewForm from '../../components/ReviewForm';
+import ReviewList from '../../components/ReviewList';
 import { makeSelectAuthState } from '../App/selectors';
 import makeSelectStudy from './selectors';
 import * as actions from './actions';
@@ -20,125 +17,23 @@ const defaultTabs = [
   'crowd', 'descriptive', 'administrative', 'recruitment', 'tracking',
 ];
 
-const CrowdTab = (props) => (
-  !props.data ? null :
-  <Table striped>
-    <thead>
-      <tr>
-        <th width="20%">Label</th>
-        <th width="60%">Description</th>
-        <th width="10%"></th>
-        <th width="10%"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {props.data.map((item) => (
-        <tr key={item.label}>
-          <td><b>{item.label}</b></td>
-          <td>{item.value}</td>
-          <td>Update</td>
-          <td>Delete</td>
-        </tr>
-      ))}
-    </tbody>
-  </Table>
-);
-
-CrowdTab.propTypes = {
-  data: PropTypes.array,
-};
-
-const StudyTab = (props) => (
-  !props.data ? null :
-  <Table striped bordered condensed>
-    <tbody>
-      {props.data.map((item) => (
-        <tr key={item.label}>
-          <td><b>{item.label}</b></td>
-          <td>{item.value}</td>
-        </tr>
-      ))}
-    </tbody>
-  </Table>
-);
-
-StudyTab.propTypes = {
-  data: PropTypes.array,
-};
-
-const StudySidenav = (props) => (
-  <Col md={3} id="study-sidenav">
-    <Row>
-      <Col md={12}>
-        <h2>{props.nct_id}</h2>
-      </Col>
-    </Row>
-    <Row>
-      <Col md={12}>
-        <ReactStars
-          count={5}
-          edit={false}
-          value={props.average_rating}
-        />
-        <small><i>{props.review_count || 0} Reviews</i></small>
-      </Col>
-    </Row>
-    <Row style={{ marginBottom: '10px', marginTop: '10px' }}>
-      <Col md={12}>
-        { props.loggedIn ?
-          <Button href={`/${props.nct_id}/review`}>Write a Review</Button>
-          : null
-        }
-      </Col>
-    </Row>
-    <Row>
-      <Col md={12}>
-        <dl>
-          <dt>Type</dt>
-          <dd>{props.study_type}</dd>
-          <dt>Status</dt>
-          <dd>{props.overall_status}</dd>
-          <dt>Primary Completion Date</dt>
-          <dd>{props.primary_completion_date}</dd>
-          <dt>Enrollment</dt>
-          <dd>{props.enrollment}</dd>
-          <dt>Source</dt>
-          <dd>{props.source}</dd>
-        </dl>
-      </Col>
-    </Row>
-    <TagManager
-      {...props}
-      onTagSubmit={props.onTagSubmit}
-      onTagRemove={props.onTagRemove}
-    />
-  </Col>
-);
-
-StudySidenav.propTypes = {
-  nct_id: PropTypes.string,
-  average_rating: PropTypes.number,
-  review_count: PropTypes.number,
-  study_type: PropTypes.string,
-  overall_status: PropTypes.string,
-  primary_completion_date: PropTypes.string,
-  enrollment: PropTypes.number,
-  source: PropTypes.string,
-  onTagSubmit: PropTypes.func.isRequired,
-  onTagRemove: PropTypes.func.isRequired,
-  /* eslint-disable react/no-unused-prop-types */
-  loggedIn: PropTypes.bool,
-};
-
 export class Study extends React.Component {
   constructor(props) {
     super(props);
     this.onTagSubmit = this.onTagSubmit.bind(this);
     this.onTagRemove = this.onTagRemove.bind(this);
+    this.onAnnotationCreate = this.onAnnotationCreate.bind(this);
+    this.onAnnotationRemove = this.onAnnotationRemove.bind(this);
+    this.onAnnotationUpdate = this.onAnnotationUpdate.bind(this);
+    this.onReviewSubmit = this.onReviewSubmit.bind(this);
+    this.onReviewDelete = this.onReviewDelete.bind(this);
   }
 
   componentWillMount() {
     this.props.getStudy(this.props.params.nctId);
+    if (this.props.params.reviewId) {
+      this.props.getReview(this.props.params.reviewId);
+    }
     this.tabs = defaultTabs;
   }
 
@@ -156,6 +51,37 @@ export class Study extends React.Component {
       .then(this.props.reload(this.props.params.nctId));
   }
 
+  onAnnotationCreate() {
+    this.props.onAnnotationCreate();
+  }
+
+  onAnnotationRemove(e, annotationId) {
+    e.preventDefault();
+    this.props.onAnnotationRemove(annotationId);
+  }
+
+  onAnnotationUpdate() {
+    this.props.onAnnotationUpdate();
+  }
+
+  onReviewSubmit(comment, rating, reviewId) {
+    if (reviewId) {
+      this.props.onReviewUpdate(reviewId, comment, rating)
+        .then(() => this.props.reload(this.props.params.nctId))
+        .then(() => this.props.router.push(`/reviews/${this.props.params.nctId}`));
+    } else {
+      this.props.onReviewSubmit(this.props.params.nctId, comment, rating)
+        .then(() => this.props.reload(this.props.params.nctId))
+        .then(() => this.props.router.push(`/reviews/${this.props.params.nctId}`));
+    }
+  }
+
+  onReviewDelete(nctId, reviewId) {
+    this.props.onReviewDelete(reviewId)
+      .then(() => this.props.reload(nctId))
+      .then(() => this.props.router.push(`/reviews/${nctId}`));
+  }
+
   getStudyTabs() {
     return (
       <Tabs defaultActiveKey={this.tabs[0]} id="study-tabs-main">
@@ -167,15 +93,57 @@ export class Study extends React.Component {
               title={`${tab} info`.toUpperCase()}
             >
               <Well style={{ background: 'rgba(240, 240, 240, 0.5)' }}>
-                { tab === 'crowd'
-                  ? <CrowdTab data={this.props.Study[tab]} />
-                  : <StudyTab data={this.props.Study[tab]} />
+                { tab === 'crowd' ?
+                  <CrowdTab
+                    data={this.props.Study[tab]}
+                    loggedIn={this.props.Auth.loggedIn}
+                  />
+                : <StudyTab data={this.props.Study[tab]} />
                 }
               </Well>
             </Tab>
           ))
         }
       </Tabs>
+    );
+  }
+
+  getMainView() {
+    if (this.props.location.pathname.match(/\/review\//)) {
+      let review = '';
+      let stars = 0;
+      let reviewId = null;
+      if (this.props.Study.review) {
+        review = this.props.Study.review.comment;
+        stars = this.props.Study.review.rating;
+        reviewId = this.props.Study.review.id;
+      }
+      return (
+        <ReviewForm
+          {...this.props}
+          loggedIn={this.props.Auth.loggedIn}
+          onReviewSubmit={this.onReviewSubmit}
+          review={review}
+          stars={String(stars)}
+          reviewId={reviewId}
+        />
+      );
+    }
+    if (this.props.location.pathname.match(/\/reviews\//)) {
+      return (
+        <ReviewList
+          reviews={this.props.Study.reviews}
+          nctId={this.props.params.nctId}
+          loggedIn={this.props.Auth.loggedIn}
+          onReviewDelete={this.onReviewDelete}
+        />);
+    }
+    return (
+      <Row id="study-tabs">
+        <Col md={12}>
+          {this.getStudyTabs()}
+        </Col>
+      </Row>
     );
   }
 
@@ -212,11 +180,7 @@ export class Study extends React.Component {
                 <h1>{this.props.Study.study.title}</h1>
               </Col>
             </Row>
-            <Row id="study-tabs">
-              <Col md={12}>
-                {this.getStudyTabs()}
-              </Col>
-            </Row>
+            {this.getMainView()}
           </Col>
         </Row>
 
@@ -230,9 +194,18 @@ Study.propTypes = {
   Auth: PropTypes.object,
   getStudy: PropTypes.func.isRequired,
   params: PropTypes.object,
+  location: PropTypes.object,
+  router: PropTypes.object,
   onTagSubmit: PropTypes.func.isRequired,
   onTagRemove: PropTypes.func.isRequired,
+  onReviewSubmit: PropTypes.func.isRequired,
+  onReviewUpdate: PropTypes.func.isRequired,
+  onReviewDelete: PropTypes.func.isRequired,
+  getReview: PropTypes.func.isRequired,
   reload: PropTypes.func.isRequired,
+  onAnnotationRemove: PropTypes.func.isRequired,
+  onAnnotationUpdate: PropTypes.func.isRequired,
+  onAnnotationCreate: PropTypes.func.isRequired,
 };
 
 Study.defaultProps = {
@@ -246,7 +219,10 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    reload: (nctId) => actions.defaultAction(dispatch, nctId),
+    reload: (nctId) => Promise.all([
+      actions.defaultAction(dispatch, nctId)(),
+      actions.reviewsAction(dispatch, nctId)(),
+    ]),
     getStudy: (nctId) => Promise.all([
       actions.defaultAction(dispatch, nctId)(),
       actions.crowdAction(dispatch, nctId)(),
@@ -254,9 +230,17 @@ function mapDispatchToProps(dispatch) {
       actions.descriptiveAction(dispatch, nctId)(),
       actions.adminAction(dispatch, nctId)(),
       actions.recruitmentAction(dispatch, nctId)(),
+      actions.reviewsAction(dispatch, nctId)(),
     ]),
     onTagSubmit: actions.submitTagAction(dispatch),
     onTagRemove: actions.removeTagAction(dispatch),
+    onReviewSubmit: actions.submitReviewAction(dispatch),
+    onReviewUpdate: actions.updateReviewAction(dispatch),
+    onReviewDelete: actions.deleteReviewAction(dispatch),
+    getReview: actions.getReviewAction(dispatch),
+    onAnnotationRemove: () => {},
+    onAnnotationUpdate: () => {},
+    onAnnotationCreate: () => {},
   };
 }
 

@@ -12,6 +12,8 @@ import {
   DESCRIPTIVE_ACTION,
   ADMINISTRATIVE_ACTION,
   RECRUITMENT_ACTION,
+  REVIEWS_RECEIVE_ACTION,
+  REVIEW_RECEIVE_ACTION,
 } from './constants';
 
 const initialState = fromJS({});
@@ -30,6 +32,10 @@ function studyReducer(state = initialState, action) {
       return state.set('administrative', action.data);
     case RECRUITMENT_ACTION:
       return state.set('recruitment', action.data);
+    case REVIEWS_RECEIVE_ACTION:
+      return state.set('reviews', action.data);
+    case REVIEW_RECEIVE_ACTION:
+      return state.set('review', action.data);
     default:
       return state;
   }
