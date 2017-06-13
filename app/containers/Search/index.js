@@ -16,6 +16,8 @@ import Helmet from 'react-helmet';
 import FontAwesome from 'react-fontawesome';
 import { createStructuredSelector } from 'reselect';
 import SearchWrapper from '../../components/SearchWrapper';
+import AuthButton from '../../components/AuthButton';
+import { makeSelectAuthState } from '../App/selectors';
 import makeSelectSearch from './selectors';
 import { defaultAction } from './actions';
 
@@ -265,6 +267,14 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
             { name: 'description', content: 'Description of Search' },
           ]}
         />
+        <Row id="clinwiki-header" className="">
+          <Col md={8}>
+            <h1><a href="/">Clinwiki</a></h1>
+          </Col>
+          <Col md={4} className="text-right">
+            <AuthButton {...this.props.Auth} />
+          </Col>
+        </Row>
         <Row id="search-controls" style={{ marginBottom: '10px' }}>
           <Col md={8} id="aggs">
             <Row>
@@ -385,6 +395,7 @@ Search.propTypes = {
   pageLength: PropTypes.number,
   router: PropTypes.object,
   params: PropTypes.object,
+  Auth: PropTypes.object,
   Search: PropTypes.shape({
     page: PropTypes.number,
     query: PropTypes.string,
@@ -403,11 +414,12 @@ Search.defaultProps = {
 
 const mapStateToProps = createStructuredSelector({
   Search: makeSelectSearch(),
+  Auth: makeSelectAuthState(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    search: (params) => defaultAction(dispatch, params)(),
+    search: defaultAction(dispatch),
   };
 }
 

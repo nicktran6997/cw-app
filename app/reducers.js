@@ -6,8 +6,10 @@
 import { combineReducers } from 'redux-immutable';
 import { fromJS } from 'immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
-
-import languageProviderReducer from 'containers/LanguageProvider/reducer';
+import {
+  LOGIN_ACTION, SIGNUP_ACTION, LOGOUT_ACTION, IS_LOGGED_IN_ACTION,
+} from './containers/LoginSignup/constants';
+import languageProviderReducer from './containers/LanguageProvider/reducer';
 
 /*
  * routeReducer
@@ -37,11 +39,32 @@ function routeReducer(state = routeInitialState, action) {
   }
 }
 
+const authInitialState = fromJS({
+  loggedIn: false,
+});
+
+function authReducer(state = authInitialState, action) {
+  switch (action.type) {
+    case LOGIN_ACTION:
+    case SIGNUP_ACTION:
+      return state.set('loggedIn', true);
+    case IS_LOGGED_IN_ACTION:
+      return state
+        .set('loggedIn', action.data.loggedIn)
+        .set('email', action.data.email);
+    case LOGOUT_ACTION:
+      return state.set('loggedIn', false);
+    default:
+      return state;
+  }
+}
+
 /**
  * Creates the main reducer with the asynchronously loaded ones
  */
 export default function createReducer(asyncReducers) {
   return combineReducers({
+    auth: authReducer,
     route: routeReducer,
     language: languageProviderReducer,
     ...asyncReducers,
