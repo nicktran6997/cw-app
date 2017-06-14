@@ -10,7 +10,7 @@ import {
 
 export const defaultAction = (dispatch) =>
   (params) =>
-    client.post(`http://localhost:3000/studies/search/${params.query}/json`, params)
+    client.post(`/studies/search/${params.query}/json`, params)
       .then((data) =>
         dispatch({
           type: DEFAULT_ACTION,

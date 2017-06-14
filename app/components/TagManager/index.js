@@ -94,7 +94,7 @@ class TagManager extends React.Component {
 // idk why loggedIn isn't working
 /* eslint-disable react/no-unused-prop-types */
 TagManager.propTypes = {
-  tags: React.PropTypes.arrayOf(React.PropTypes.string),
+  tags: React.PropTypes.arrayOf(React.PropTypes.object),
   onTagRemove: React.PropTypes.func,
   onTagSubmit: React.PropTypes.func,
   loggedIn: React.PropTypes.bool,

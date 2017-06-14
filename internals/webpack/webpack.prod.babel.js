@@ -66,6 +66,12 @@ module.exports = require('./webpack.base.babel')({
 
       AppCache: false,
     }),
+
+    new webpack.DefinePlugin({
+      'process.env': {
+        API_HOST: JSON.stringify('http://clinwiki-dev.herokuapp.com/api'),
+      },
+    }),
   ],
 
   performance: {
