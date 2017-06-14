@@ -69,7 +69,7 @@ module.exports = require('./webpack.base.babel')({
 
     new webpack.DefinePlugin({
       'process.env': {
-        API_HOST: JSON.stringify('http://clinwiki-dev.herokuapp.com/api'),
+        API_HOST: JSON.stringify('//clinwiki-dev.herokuapp.com/api'),
       },
     }),
   ],
