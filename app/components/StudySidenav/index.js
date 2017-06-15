@@ -24,13 +24,13 @@ const StudySidenav = (props) => (
       <Col md={12}>
         <ButtonGroup>
           <Button
-            onClick={this.props.router.push(`/reviews/${props.nct_id}`)}
+            onClick={() => props.router.push(`/reviews/${props.nct_id}`)}
           >
             View Reviews
           </Button>
           { props.loggedIn ?
             <Button
-              onClick={this.props.router.push(`/review/${props.nct_id}`)}
+              onClick={() => props.router.push(`/review/${props.nct_id}`)}
             >
               Write a Review
             </Button>
@@ -76,6 +76,7 @@ StudySidenav.propTypes = {
   onTagRemove: PropTypes.func.isRequired,
   /* eslint-disable react/no-unused-prop-types */
   loggedIn: PropTypes.bool,
+  router: PropTypes.object,
 };
 
 export default StudySidenav;

@@ -27,6 +27,7 @@ class TagManager extends React.Component {
   onTagSubmit(e) {
     e.persist();
     this.props.onTagSubmit(e, this.newTag);
+    this.textInput.value = '';
   }
 
   changeNewTag(e) {
@@ -75,7 +76,13 @@ class TagManager extends React.Component {
                 <FormGroup controlId="formInlineEmail">
                   <FormControl
                     type="text"
+                    inputRef={(ref) => { this.textInput = ref; }}
                     onChange={this.changeNewTag}
+                    onKeyPress={(e) => {
+                      if (e.charCode === 13) {
+                        this.onTagSubmit(e);
+                      }
+                    }}
                   />
                 </FormGroup>
                 {' '}

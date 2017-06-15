@@ -41,14 +41,14 @@ export class Study extends React.Component {
     e.preventDefault();
     if (newTag) {
       this.props.onTagSubmit(this.props.params.nctId, newTag)
-        .then(this.props.reload(this.props.params.nctId));
+        .then(() => this.props.reload(this.props.params.nctId));
     }
   }
 
   onTagRemove(e, tagId) {
     e.preventDefault();
     this.props.onTagRemove(this.props.params.nctId, tagId)
-      .then(this.props.reload(this.props.params.nctId));
+      .then(() => this.props.reload(this.props.params.nctId));
   }
 
   onAnnotationCreate() {
