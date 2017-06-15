@@ -28,12 +28,15 @@ export class Study extends React.Component {
     this.onReviewSubmit = this.onReviewSubmit.bind(this);
     this.onReviewDelete = this.onReviewDelete.bind(this);
     this.reload = this.reload.bind(this);
+    this.reviewIsLoading = false;
   }
 
   componentWillMount() {
     this.props.getStudy(this.props.params.nctId);
     if (this.props.params.reviewId) {
-      this.props.getReview(this.props.params.reviewId);
+      this.reviewIsLoading = true;
+      this.props.getReview(this.props.params.reviewId)
+        .then(() => { this.reviewIsLoading = false; });
     }
     this.tabs = defaultTabs;
   }
@@ -132,6 +135,7 @@ export class Study extends React.Component {
           review={review}
           stars={String(stars)}
           reviewId={reviewId}
+          reviewIsLoading={this.reviewIsLoading}
         />
       );
     }
@@ -142,6 +146,7 @@ export class Study extends React.Component {
           nctId={this.props.params.nctId}
           loggedIn={this.props.Auth.loggedIn}
           onReviewDelete={this.onReviewDelete}
+          router={this.props.router}
         />);
     }
     return (
@@ -180,6 +185,7 @@ export class Study extends React.Component {
         <Row>
           <StudySidenav
             {...this.props.Study.study}
+            router={this.props.router}
             loggedIn={this.props.Auth.loggedIn}
             onTagSubmit={this.onTagSubmit}
             onTagRemove={this.onTagRemove}

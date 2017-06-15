@@ -87,6 +87,11 @@ class CrowdTab extends React.Component {
                     type="text"
                     defaultValue={item.description}
                     onChange={(e) => this.onDescriptionChange(e, item.id)}
+                    onKeyPress={(e) => {
+                      if (e.charCode === 13) {
+                        this.onAnnotationUpdateSubmit(item.id);
+                      }
+                    }}
                   />
                   : item.description
               }
@@ -123,6 +128,11 @@ class CrowdTab extends React.Component {
                   style={{ width: '100%', border: '1px solid #ccc' }}
                   placeholder="Add a description..."
                   onChange={(e) => { this.newDescription = e.target.value; }}
+                  onKeyPress={(e) => {
+                    if (e.charCode === 13) {
+                      this.createAnnotation();
+                    }
+                  }}
                 />
               </td>
               <td colSpan={2} className="text-right">

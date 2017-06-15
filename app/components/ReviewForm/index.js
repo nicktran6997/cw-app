@@ -33,31 +33,34 @@ class ReviewForm extends React.Component {
     return (
       <Row id="study-tabs">
         <Col md={12}>
-          <form onSubmit={this.onReviewSubmit}>
-            <ReactStars
-              count={5}
-              value={this.stars}
-              onChange={this.onStarChange}
-            />
-            <FormGroup controlId="formControlsTextarea">
-              <ControlLabel style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
-                Add Your Review
-              </ControlLabel>
-              <FormControl
-                componentClass="textarea"
-                defaultValue={this.props.review}
-                placeholder="Add your review"
-                onChange={this.onReviewChange}
+          {
+            this.props.reviewIsLoading ? null :
+            <form onSubmit={this.onReviewSubmit}>
+              <ReactStars
+                count={5}
+                value={this.stars}
+                onChange={this.onStarChange}
               />
-            </FormGroup>
-            <Row>
-              <Col md={12} className="text-right">
-                <Button type="submit">
-                  Submit
-                </Button>
-              </Col>
-            </Row>
-          </form>
+              <FormGroup controlId="formControlsTextarea">
+                <ControlLabel style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
+                  Add Your Review
+                </ControlLabel>
+                <FormControl
+                  componentClass="textarea"
+                  defaultValue={this.props.review}
+                  placeholder="Add your review"
+                  onChange={this.onReviewChange}
+                />
+              </FormGroup>
+              <Row>
+                <Col md={12} className="text-right">
+                  <Button type="submit">
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            </form>
+          }
         </Col>
       </Row>
     );
@@ -70,6 +73,7 @@ ReviewForm.propTypes = {
   stars: React.PropTypes.string,
   review: React.PropTypes.string,
   reviewId: React.PropTypes.number,
+  reviewIsLoading: React.PropTypes.bool,
 };
 
 ReviewForm.defaultProps = {

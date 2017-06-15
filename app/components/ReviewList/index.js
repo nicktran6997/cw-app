@@ -47,11 +47,13 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                     {this.props.loggedIn ?
                       <ButtonGroup>
                         <Button
-                          onClick={this.props.router.push(`/review/${this.props.nctId}/edit/${review.review.id}`)}
+                          id={`edit-review-${review.review.id}`}
+                          onClick={() => this.props.router.push(`/review/${this.props.nctId}/edit/${review.review.id}`)}
                         >
                           Edit
                         </Button>
                         <Button
+                          id={`delete-review-${review.review.id}`}
                           onClick={() =>
                             this.props.onReviewDelete(review.review.nct_id, review.review.id)}
                         >
