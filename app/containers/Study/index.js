@@ -27,6 +27,7 @@ export class Study extends React.Component {
     this.onAnnotationUpdate = this.onAnnotationUpdate.bind(this);
     this.onReviewSubmit = this.onReviewSubmit.bind(this);
     this.onReviewDelete = this.onReviewDelete.bind(this);
+    this.reload = this.reload.bind(this);
   }
 
   componentWillMount() {
@@ -41,27 +42,29 @@ export class Study extends React.Component {
     e.preventDefault();
     if (newTag) {
       this.props.onTagSubmit(this.props.params.nctId, newTag)
-        .then(() => this.props.reload(this.props.params.nctId));
+        .then(this.reload);
     }
   }
 
   onTagRemove(e, tagId) {
     e.preventDefault();
     this.props.onTagRemove(this.props.params.nctId, tagId)
-      .then(() => this.props.reload(this.props.params.nctId));
+      .then(this.reload);
   }
 
-  onAnnotationCreate() {
-    this.props.onAnnotationCreate();
+  onAnnotationCreate(label, description) {
+    return this.props.onAnnotationCreate(this.props.params.nctId, label, description)
+      .then(this.reload);
   }
 
-  onAnnotationRemove(e, annotationId) {
-    e.preventDefault();
-    this.props.onAnnotationRemove(annotationId);
+  onAnnotationRemove(annotationId) {
+    return this.props.onAnnotationRemove(annotationId)
+      .then(this.reload);
   }
 
-  onAnnotationUpdate() {
-    this.props.onAnnotationUpdate();
+  onAnnotationUpdate(annotationId, description) {
+    this.props.onAnnotationUpdate(annotationId, description)
+      .then(this.reload);
   }
 
   onReviewSubmit(comment, rating, reviewId) {
@@ -71,7 +74,7 @@ export class Study extends React.Component {
         .then(() => this.props.router.push(`/reviews/${this.props.params.nctId}`));
     } else {
       this.props.onReviewSubmit(this.props.params.nctId, comment, rating)
-        .then(() => this.props.reload(this.props.params.nctId))
+        .then(this.reload)
         .then(() => this.props.router.push(`/reviews/${this.props.params.nctId}`));
     }
   }
@@ -97,6 +100,9 @@ export class Study extends React.Component {
                   <CrowdTab
                     data={this.props.Study[tab]}
                     loggedIn={this.props.Auth.loggedIn}
+                    onAnnotationRemove={this.onAnnotationRemove}
+                    onAnnotationUpdate={this.onAnnotationUpdate}
+                    onAnnotationCreate={this.onAnnotationCreate}
                   />
                 : <StudyTab data={this.props.Study[tab]} />
                 }
@@ -145,6 +151,10 @@ export class Study extends React.Component {
         </Col>
       </Row>
     );
+  }
+
+  reload() {
+    this.props.reload(this.props.params.nctId);
   }
 
   render() {
@@ -222,6 +232,7 @@ function mapDispatchToProps(dispatch) {
     reload: (nctId) => Promise.all([
       actions.defaultAction(dispatch, nctId)(),
       actions.reviewsAction(dispatch, nctId)(),
+      actions.crowdAction(dispatch, nctId)(),
     ]),
     getStudy: (nctId) => Promise.all([
       actions.defaultAction(dispatch, nctId)(),
@@ -238,9 +249,9 @@ function mapDispatchToProps(dispatch) {
     onReviewUpdate: actions.updateReviewAction(dispatch),
     onReviewDelete: actions.deleteReviewAction(dispatch),
     getReview: actions.getReviewAction(dispatch),
-    onAnnotationRemove: () => {},
-    onAnnotationUpdate: () => {},
-    onAnnotationCreate: () => {},
+    onAnnotationRemove: actions.deleteAnnotationAction(dispatch),
+    onAnnotationUpdate: actions.updateAnnotationAction(dispatch),
+    onAnnotationCreate: actions.createAnnotationAction(dispatch),
   };
 }
 

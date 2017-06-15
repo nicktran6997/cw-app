@@ -45,7 +45,8 @@ class ReviewForm extends React.Component {
               </ControlLabel>
               <FormControl
                 componentClass="textarea"
-                placeholder={this.props.review || 'Add your review'}
+                defaultValue={this.props.review}
+                placeholder="Add your review"
                 onChange={this.onReviewChange}
               />
             </FormGroup>

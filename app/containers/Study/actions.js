@@ -18,6 +18,9 @@ import {
   REVIEWS_RECEIVE_ACTION,
   REVIEW_RECEIVE_ACTION,
   REVIEW_DELETE_ACTION,
+  ANNOTATION_CREATE_ACTION,
+  ANNOTATION_DELETE_ACTION,
+  ANNOTATION_UPDATE_ACTION,
 } from './constants';
 
 export const defaultAction = (dispatch, nctId) =>
@@ -90,6 +93,31 @@ export const submitTagAction = (dispatch) =>
       type: TAG_SUBMIT_ACTION,
       data: data.data,
     }));
+
+export const updateAnnotationAction = (dispatch) =>
+  (annotationId, description) =>
+    client.patch(`/annotations/${annotationId}.json`, { description })
+    .then(() =>
+      dispatch({
+        type: ANNOTATION_UPDATE_ACTION,
+      }));
+
+export const deleteAnnotationAction = (dispatch) =>
+  (annotationId) =>
+    client.delete(`/annotations/${annotationId}.json`)
+    .then(() =>
+      dispatch({
+        type: ANNOTATION_DELETE_ACTION,
+      }));
+
+export const createAnnotationAction = (dispatch) =>
+  (nctId, label, description) =>
+    client.post('/annotations.json', { nct_id: nctId, label, description })
+    .then(() =>
+      dispatch({
+        type: ANNOTATION_CREATE_ACTION,
+      }));
+
 
 export const submitReviewAction = (dispatch) =>
   (nctId, comment, rating) =>
