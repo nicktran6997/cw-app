@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactStars from 'react-stars';
-import { Link } from 'react-router';
 import { Table, Row, Col, Button, ButtonGroup } from 'react-bootstrap';
 
 class ReviewList extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -47,13 +46,10 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                   <Col md={3}>
                     {this.props.loggedIn ?
                       <ButtonGroup>
-                        <Button>
-                          <Link
-                            to={`/review/${this.props.nctId}/edit/${review.review.id}`}
-                            style={{ color: 'rgb(51, 51, 51)' }}
-                          >
-                            Edit
-                          </Link>
+                        <Button
+                          onClick={this.props.router.push(`/review/${this.props.nctId}/edit/${review.review.id}`)}
+                        >
+                          Edit
                         </Button>
                         <Button
                           onClick={() =>
@@ -79,6 +75,7 @@ ReviewList.propTypes = {
   nctId: React.PropTypes.string,
   onReviewDelete: React.PropTypes.func,
   loggedIn: React.PropTypes.bool,
+  router: React.PropTypes.object,
 };
 
 ReviewList.defaultProps = {

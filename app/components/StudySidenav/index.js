@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { Col, Row, Button, ButtonGroup } from 'react-bootstrap';
-import { Link } from 'react-router';
 import ReactStars from 'react-stars';
 import TagManager from '../../components/TagManager';
 
@@ -24,22 +23,16 @@ const StudySidenav = (props) => (
     <Row style={{ marginBottom: '10px', marginTop: '10px' }}>
       <Col md={12}>
         <ButtonGroup>
-          <Button>
-            <Link
-              style={{ color: 'rgb(51, 51, 51)' }}
-              to={`/reviews/${props.nct_id}`}
-            >
-              View Reviews
-            </Link>
+          <Button
+            onClick={this.props.router.push(`/reviews/${props.nct_id}`)}
+          >
+            View Reviews
           </Button>
           { props.loggedIn ?
-            <Button>
-              <Link
-                to={`/review/${props.nct_id}`}
-                style={{ color: 'rgb(51, 51, 51)' }}
-              >
-                Write a Review
-              </Link>
+            <Button
+              onClick={this.props.router.push(`/review/${props.nct_id}`)}
+            >
+              Write a Review
             </Button>
             : null
           }
