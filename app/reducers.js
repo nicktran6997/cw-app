@@ -51,9 +51,11 @@ function authReducer(state = authInitialState, action) {
     case IS_LOGGED_IN_ACTION:
       return state
         .set('loggedIn', action.data.loggedIn)
-        .set('email', action.data.email);
+        .set('user', action.data);
     case LOGOUT_ACTION:
-      return state.set('loggedIn', false);
+      return state
+      .set('loggedIn', false)
+      .set('user', null);
     default:
       return state;
   }

@@ -179,7 +179,7 @@ export class Study extends React.Component {
             <h1><a href="/">Clinwiki</a></h1>
           </Col>
           <Col md={4} className="text-right">
-            <AuthButton {...this.props.Auth} />
+            <AuthButton {...this.props.Auth} router={this.props.router} />
           </Col>
         </Row>
         <Row>

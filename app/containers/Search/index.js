@@ -38,10 +38,11 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   constructor(props) {
     super(props);
-    this.query = this.props.Search.query || this.props.params.query || '';
+    this.query = this.getDefaultQuery();
     this.aggs = this.props.Search.aggsSent || {};
     this.page = this.props.Search.page || 0;
     this.sorts = this.props.Search.sorts || {};
+    this.getDefaultQuery = this.getDefaultQuery.bind(this);
     this.onPageChange = this.onPageChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
@@ -105,6 +106,13 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
       page: this.page,
     }, this.getAggsObject(), this.getSortsObject());
     return searchParams;
+  }
+
+  getDefaultQuery() {
+    // todo:
+    // figure out how to support this.props.Auth.user.default_query_string
+    // while still supporting viewing all studies!
+    return this.props.Search.query || this.props.params.query || '';
   }
 
   getAggsObject() {
@@ -272,7 +280,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
             <h1><a href="/">Clinwiki</a></h1>
           </Col>
           <Col md={4} className="text-right">
-            <AuthButton {...this.props.Auth} />
+            <AuthButton {...this.props.Auth} router={this.props.router} />
           </Col>
         </Row>
         <Row id="search-controls" style={{ marginBottom: '10px' }}>
@@ -305,7 +313,8 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
               <FormGroup controlId="formInlineEmail">
                 <FormControl
                   type="text"
-                  placeholder={this.props.params.query || 'Search...'}
+                  placeholder={'Search...'}
+                  defaultValue={this.getDefaultQuery()}
                   onChange={this.onSearchChange}
                 />
               </FormGroup>

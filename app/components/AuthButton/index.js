@@ -17,8 +17,9 @@ const AuthButton = (props) => {
   }
   return (
     <div style={{ marginTop: '10px' }}>
-      <DropdownButton title={props.email || ''} id="loggedIn">
-        <MenuItem href="/logout">Log Out</MenuItem>
+      <DropdownButton title={(props.user && props.user.email) || ''} id="loggedIn">
+        <MenuItem onClick={() => props.router.push('/profile')}>Profile</MenuItem>
+        <MenuItem onClick={() => props.router.push('/logout')}>Log Out</MenuItem>
       </DropdownButton>
     </div>
   );
@@ -26,7 +27,8 @@ const AuthButton = (props) => {
 
 AuthButton.propTypes = {
   loggedIn: React.PropTypes.bool,
-  email: React.PropTypes.string,
+  user: React.PropTypes.object,
+  router: React.PropTypes.object,
 };
 
 export default AuthButton;

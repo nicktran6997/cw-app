@@ -44,6 +44,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/search',
+      name: 'search',
+      onEnter: isLoggedIn,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Search/reducer'),
+          import('containers/Search/sagas'),
+          import('containers/Search'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('search', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/search/:query',
       name: 'search',
       onEnter: isLoggedIn,
@@ -171,6 +192,25 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, component]) => {
           injectReducer('study', reducer.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/profile',
+      name: 'profile',
+      onEnter: isLoggedIn,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Profile/reducer'),
+          import('containers/Profile'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, component]) => {
+          injectReducer('profile', reducer.default);
           renderRoute(component);
         });
 
