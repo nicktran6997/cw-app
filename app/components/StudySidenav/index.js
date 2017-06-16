@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Col, Row, Button, ButtonGroup } from 'react-bootstrap';
 import ReactStars from 'react-stars';
+import FontAwesome from 'react-fontawesome';
 import TagManager from '../../components/TagManager';
 
 const StudySidenav = (props) => (
@@ -53,6 +54,22 @@ const StudySidenav = (props) => (
           <dt>Source</dt>
           <dd>{props.source}</dd>
         </dl>
+      </Col>
+    </Row>
+    <Row>
+      <Col md={12} className="text-center">
+        {
+          props.router.location.pathname.match('/review')
+          ? (
+            <Button onClick={() => props.router.push(`/study/${props.nct_id}`)}>
+              <FontAwesome name="chevron-left" />Back to Study
+            </Button>
+          ) : (
+            <Button onClick={() => props.router.push('/')}>
+              <FontAwesome name="chevron-left" />Back to Search
+            </Button>
+          )
+        }
       </Col>
     </Row>
     <TagManager
