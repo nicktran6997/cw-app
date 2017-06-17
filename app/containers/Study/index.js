@@ -34,11 +34,15 @@ export class Study extends React.Component {
   componentWillMount() {
     this.props.getStudy(this.props.params.nctId);
     if (this.props.params.reviewId) {
-      this.reviewIsLoading = true;
-      this.props.getReview(this.props.params.reviewId)
-        .then(() => { this.reviewIsLoading = false; });
+      this.loadReview(this.props.params.reviewId);
     }
     this.tabs = defaultTabs;
+  }
+
+  componentWillReceiveProps(props) {
+    if (props.params.reviewId && props.params.reviewId !== this.props.params.reviewId) {
+      this.loadReview(props.params.reviewId);
+    }
   }
 
   onTagSubmit(e, newTag) {
@@ -156,6 +160,12 @@ export class Study extends React.Component {
         </Col>
       </Row>
     );
+  }
+
+  loadReview(reviewId) {
+    this.reviewIsLoading = true;
+    this.props.getReview(reviewId)
+      .then(() => { this.reviewIsLoading = false; this.forceUpdate(); });
   }
 
   reload() {
