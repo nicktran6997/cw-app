@@ -29,7 +29,7 @@ export const searchAction = (dispatch) =>
             query: params.query,
             page: params.page,
             aggsSent: params.agg_filters,
-            sorts: params.sorts,
+            sort: params.sorts,
           }),
         }));
   };
@@ -73,7 +73,7 @@ export const getSearchParams = (props) => Object.assign({
   start: (props.Search.page) * props.pageLength,
   length: props.pageLength,
   page: props.Search.page,
-  sorts: props.Search.sorts,
+  sort: props.Search.sorts,
 }, getAggsObject(props));
 
 export const getQuery = (props) => {
