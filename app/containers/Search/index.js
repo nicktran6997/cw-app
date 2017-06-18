@@ -49,8 +49,8 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
   onSubmit(e) {
     e.preventDefault();
     this.props.onQueryChange(this.query)
-      .then(() => this.props.router.push(`/search/${this.props.Search.query}`))
-      .then(() => this.doSearch(this.props, this.query));
+      .then(() => this.doSearch(this.props, this.query))
+      .then(() => this.props.router.push(`/search/${this.props.Search.query}`));
   }
 
   onSearchChange(e) {
@@ -319,7 +319,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
               nextLabel="next"
               breakLabel={<a href="">...</a>}
               breakClassName="break-me"
-              pageNum={1}
+              initialPage={this.props.Search.page}
               marginPagesDisplayed={2}
               pageRangeDisplayed={15}
               onPageChange={(e) => this.props.onPageChange(e).then(() => this.doSearch(this.props))}

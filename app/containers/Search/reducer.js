@@ -20,6 +20,8 @@ const initialState = fromJS({
   aggsSent: {},
   sorts: {},
   aggs: {},
+  query: '',
+  prevQuery: '',
 });
 
 function searchReducer(state = initialState, action) {
@@ -39,13 +41,12 @@ function searchReducer(state = initialState, action) {
       return state.set('aggsSent',
         Object.assign({}, action.data, state.get('aggsSent')))
         .set('page', 0);
+    /* eslint-disable no-case-declarations */
     case AGG_REMOVED_ACTION:
-      return state.set('aggsSent',
-        () => {
-          const aggs = state.get('aggsSent');
-          delete aggs[action.data[0]][action.data[1]];
-          return aggs;
-        })
+      const aggs = state.get('aggsSent');
+      delete aggs[action.data[0]][action.data[1]];
+      return state
+        .set('aggsSent', aggs)
         .set('page', 0);
     case TOGGLE_SORT_ACTION:
       switch (state.getIn(['sorts', action.data])) {
@@ -57,7 +58,10 @@ function searchReducer(state = initialState, action) {
           return state.setIn(['sorts', action.data], 'asc');
       }
     case QUERY_CHANGE_ACTION:
-      return state.set('query', action.data).set('page', 0);
+      return state
+      .set('prevQuery', state.get('query'))
+      .set('query', action.data)
+      .set('page', 0);
     default:
       return state;
   }

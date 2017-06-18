@@ -68,8 +68,8 @@ export const queryChangeAction = (dispatch) =>
     data: query,
   }));
 
-export const getSearchParams = (props, query) => Object.assign({
-  query: query || getQuery(props),
+export const getSearchParams = (props) => Object.assign({
+  query: getQuery(props),
   start: (props.Search.page) * props.pageLength,
   length: props.pageLength,
   page: props.Search.page,
@@ -77,15 +77,16 @@ export const getSearchParams = (props, query) => Object.assign({
 }, getAggsObject(props));
 
 export const getQuery = (props) => {
+  if (props.location.pathname.match(/^\/studies\/?$/)) {
+    return '';
+  }
   if (props.Search && props.Search.query) {
     return props.Search.query;
   }
   if (props.params && props.params.query) {
     return props.params.query;
   }
-  if (!props.location.pathname.match(/\/search\/$/) &&
-      props.Auth && props.Auth.user
-      && props.Auth.user.default_query_string) {
+  if (props.route.name === 'home' && props.Search.prevQuery !== props.Auth.user.default_query_string) {
     return props.Auth.user.default_query_string;
   }
   return '';
