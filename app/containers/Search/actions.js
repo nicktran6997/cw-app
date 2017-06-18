@@ -86,7 +86,9 @@ export const getQuery = (props) => {
   if (props.params && props.params.query) {
     return props.params.query;
   }
-  if (props.route.name === 'home' && props.Search.prevQuery !== props.Auth.user.default_query_string) {
+  if (props.route.name === 'home'
+    && props.Auth && props.Auth.user
+    && props.Search.prevQuery !== props.Auth.user.default_query_string) {
     return props.Auth.user.default_query_string;
   }
   return '';
