@@ -19,7 +19,7 @@ import SearchWrapper from '../../components/SearchWrapper';
 import AuthButton from '../../components/AuthButton';
 import { makeSelectAuthState } from '../App/selectors';
 import makeSelectSearch from './selectors';
-import { defaultAction } from './actions';
+import * as actions from './actions';
 
 const aggToField = {
   average_rating: 'average rating',
@@ -38,95 +38,23 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   constructor(props) {
     super(props);
-    this.query = this.getDefaultQuery();
-    this.aggs = this.props.Search.aggsSent || {};
-    this.page = this.props.Search.page || 0;
-    this.sorts = this.props.Search.sorts || {};
-    this.getDefaultQuery = this.getDefaultQuery.bind(this);
-    this.onPageChange = this.onPageChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
-    this.onAggSelected = this.onAggSelected.bind(this);
-    this.onAggRemoved = this.onAggRemoved.bind(this);
-    this.toggleSort = this.toggleSort.bind(this);
   }
 
   componentWillMount() {
-    if (this.query !== this.props.Search.query) {
-      this.doSearch();
-    }
-  }
-
-  componentWillReceiveProps(props) {
-    this.query = props.params.query || '';
-    if (this.query !== this.props.Search.query) {
-      this.aggs = {};
-      this.page = 0;
-      this.sorts = {};
-    }
-  }
-
-  onPageChange(args) {
-    this.page = args.selected;
-    this.doSearch();
+    this.doSearch(this.props);
   }
 
   onSubmit(e) {
     e.preventDefault();
-    this.doSearch();
-    this.props.router.push(`/search/${this.query}`);
+    this.props.onQueryChange(this.query)
+      .then(() => this.doSearch(this.props, this.query))
+      .then(() => this.props.router.push(`/search/${this.props.Search.query}`));
   }
 
   onSearchChange(e) {
     this.query = e.target.value;
-  }
-
-  onAggSelected(field, key) {
-    if (!this.aggs[field]) {
-      this.aggs[field] = {};
-    }
-    // cast to string to make dates behave for now (idk)
-    this.aggs[field][String(key)] = 1;
-    this.page = 0;
-    this.doSearch();
-  }
-
-  onAggRemoved(field, key) {
-    if (this.aggs[field]) {
-      delete this.aggs[field][key];
-    }
-    this.doSearch();
-  }
-
-  getSearchParams() {
-    const searchParams = Object.assign({
-      query: this.query,
-      start: (this.page) * this.props.pageLength,
-      length: this.props.pageLength,
-      page: this.page,
-    }, this.getAggsObject(), this.getSortsObject());
-    return searchParams;
-  }
-
-  getDefaultQuery() {
-    // todo:
-    // figure out how to support this.props.Auth.user.default_query_string
-    // while still supporting viewing all studies!
-    return this.props.Search.query || this.props.params.query || '';
-  }
-
-  getAggsObject() {
-    if (this.aggs) {
-      return { agg_filters: this.aggs };
-    }
-    return {};
-  }
-
-  getSortsObject() {
-    if (this.sorts) {
-      return { sort: this.sorts };
-    }
-    return {};
   }
 
   getRowCount() {
@@ -134,8 +62,9 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
       && this.props.Search.rows.length) || 0;
   }
 
-  doSearch() {
-    this.props.search(this.getSearchParams());
+  doSearch(props, query) {
+    const theProps = props || this.props;
+    theProps.search(actions.getSearchParams(theProps, query));
   }
 
   cellForField(field) {
@@ -166,7 +95,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
   }
 
   aggDropdown(field) {
-    if (!this.props.Search.aggs) {
+    if (!this.props.Search.aggs || !this.props.Search.aggs[field]) {
       return '';
     }
     let menuItems = '';
@@ -176,7 +105,10 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
       menuItems = Object.keys(buckets).map((key) => (
         <MenuItem
           key={key}
-          onSelect={() => this.onAggSelected(field, buckets[key].key)}
+          onSelect={() =>
+            this.props.onAggSelected(field, buckets[key].key)
+              .then(() => this.doSearch(this.props))
+            }
         >
           {this.keyToInner(field, buckets[key].key)}
           {' '}
@@ -217,9 +149,9 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 
   searchFilters() {
     const searchFilters = [];
-    Object.keys(this.aggs).forEach((field) => {
-      if (this.aggs[field]) {
-        Object.keys(this.aggs[field]).forEach((key) => {
+    Object.keys(this.props.Search.aggsSent).forEach((field) => {
+      if (this.props.Search.aggsSent[field]) {
+        Object.keys(this.props.Search.aggsSent[field]).forEach((key) => {
           searchFilters.push(
             <Label style={{ marginRight: '5px' }} key={key}>
               {aggToField[field]}: {this.keyToInner(field, key)}
@@ -227,7 +159,10 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
               <FontAwesome
                 style={{ cursor: 'pointer', color: '#cc1111' }}
                 name="remove"
-                onClick={() => this.onAggRemoved(field, key)}
+                onClick={() =>
+                  this.props.onAggRemoved(field, key)
+                  .then(() => this.doSearch(this.props))
+                }
               />
             </Label>);
         });
@@ -243,27 +178,12 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
         {field}
         {' '}
         <FontAwesome
-          name={`sort${this.sorts[key] ? `-${this.sorts[key]}` : ''}`}
-          onClick={() => this.toggleSort(key)}
+          name={`sort${this.props.Search.sorts[key] ? `-${this.props.Search.sorts[key]}` : ''}`}
+          onClick={() => this.props.onToggleSort(key).then(() => this.doSearch(this.props))}
           style={{ cursor: 'pointer' }}
         />
       </Cell>
     );
-  }
-
-  toggleSort(field) {
-    switch (this.sorts[field]) {
-      case 'asc':
-        this.sorts[field] = 'desc';
-        break;
-      case 'desc':
-        delete this.sorts[field];
-        break;
-      default:
-        this.sorts[field] = 'asc';
-        break;
-    }
-    this.doSearch();
   }
 
   render() {
@@ -309,22 +229,38 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
             </Row>
           </Col>
           <Col md={4} id="query" className="text-right">
-            <Form inline onSubmit={this.onSubmit}>
-              <FormGroup controlId="formInlineEmail">
-                <FormControl
-                  type="text"
-                  placeholder={'Search...'}
-                  defaultValue={this.getDefaultQuery()}
-                  onChange={this.onSearchChange}
-                />
-              </FormGroup>
-              {' '}
-              <Button type="submit">
-                Search
-                {' '}
-                <FontAwesome name="search" />
-              </Button>
-            </Form>
+            <Row>
+              <Col md={12}>
+                <Form inline onSubmit={this.onSubmit}>
+                  <FormGroup controlId="formInlineEmail">
+                    <FormControl
+                      type="text"
+                      placeholder={'Search...'}
+                      defaultValue={actions.getQuery(this.props)}
+                      onChange={this.onSearchChange}
+                    />
+                  </FormGroup>
+                  {' '}
+                  <Button type="submit">
+                    Search
+                    {' '}
+                    <FontAwesome name="search" />
+                  </Button>
+                </Form>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12} className="text-right" style={{ marginTop: '10px', color: '#777' }}>
+                <i>
+                  Showing {(this.props.Search.page * this.props.pageLength) + 1}
+                  {' '}
+                  to {Math.min(((this.props.Search.page + 1) * this.props.pageLength),
+                                parseInt(this.props.Search.total, 10))}
+                  {' '}
+                  out of {this.props.Search.total}
+                </i>
+              </Col>
+            </Row>
           </Col>
         </Row>
         <Row id="search-filters" style={{ height: '15px', marginBottom: '10px' }}>
@@ -378,15 +314,15 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
         <Row>
           <Col md={12} className="text-center">
             <ReactPaginate
-              pageCount={Math.floor(this.props.Search.total / 25)}
+              pageCount={Math.ceil(this.props.Search.total / 25)}
               previousLabel="previous"
               nextLabel="next"
               breakLabel={<a href="">...</a>}
               breakClassName="break-me"
-              pageNum={1}
+              initialPage={this.props.Search.page}
               marginPagesDisplayed={2}
               pageRangeDisplayed={15}
-              onPageChange={this.onPageChange}
+              onPageChange={(e) => this.props.onPageChange(e).then(() => this.doSearch(this.props))}
               containerClassName="pagination"
               subContainerClassName="pages pagination"
               activeClassName="active"
@@ -399,11 +335,13 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
 }
 
 Search.propTypes = {
-  search: PropTypes.func.isRequired,
-  query: PropTypes.string,
+  onToggleSort: PropTypes.func.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  onAggSelected: PropTypes.func.isRequired,
+  onQueryChange: PropTypes.func.isRequired,
+  onAggRemoved: PropTypes.func.isRequired,
   pageLength: PropTypes.number,
   router: PropTypes.object,
-  params: PropTypes.object,
   Auth: PropTypes.object,
   Search: PropTypes.shape({
     page: PropTypes.number,
@@ -419,6 +357,13 @@ Search.propTypes = {
 Search.defaultProps = {
   query: '',
   pageLength: 25,
+  Search: {
+    total: 0,
+    page: 0,
+    aggsSent: {},
+    sorts: {},
+    aggs: {},
+  },
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -428,7 +373,12 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    search: defaultAction(dispatch),
+    search: actions.searchAction(dispatch),
+    onPageChange: actions.pageChangeAction(dispatch),
+    onAggSelected: actions.selectAggAction(dispatch),
+    onAggRemoved: actions.removeAggAction(dispatch),
+    onToggleSort: actions.toggleSortAction(dispatch),
+    onQueryChange: actions.queryChangeAction(dispatch),
   };
 }
 
