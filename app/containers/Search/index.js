@@ -259,7 +259,10 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
                   {' '}
                   out of {this.props.Search.total}
                   {' '}
-                  for <strong>{this.props.Search.query}</strong>
+                  {this.props.Search.query ?
+                    <span>for <strong>{this.props.Search.query}</strong></span>
+                    : null}
+
                 </i>
               </Col>
             </Row>
