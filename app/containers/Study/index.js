@@ -137,7 +137,7 @@ export class Study extends React.Component {
           loggedIn={this.props.Auth.loggedIn}
           onReviewSubmit={this.onReviewSubmit}
           review={review}
-          stars={String(stars)}
+          stars={stars}
           reviewId={reviewId}
           reviewIsLoading={this.reviewIsLoading}
         />

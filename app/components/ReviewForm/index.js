@@ -12,6 +12,15 @@ class ReviewForm extends React.Component {
     this.review = this.props.review;
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.review !== nextProps.review) {
+      this.review = nextProps.review;
+    }
+    if (this.props.stars !== nextProps.stars) {
+      this.stars = nextProps.stars;
+    }
+  }
+
   onStarChange(e) {
     this.stars = e;
   }
@@ -38,7 +47,8 @@ class ReviewForm extends React.Component {
             <form onSubmit={this.onReviewSubmit}>
               <ReactStars
                 count={5}
-                value={this.stars}
+                half={false}  // can't do half-star ratings with current db schema
+                value={this.props.stars}
                 onChange={this.onStarChange}
               />
               <FormGroup controlId="formControlsTextarea">
@@ -70,7 +80,7 @@ class ReviewForm extends React.Component {
 ReviewForm.propTypes = {
   onReviewSubmit: React.PropTypes.func.isRequired,
   loggedIn: React.PropTypes.bool,
-  stars: React.PropTypes.string,
+  stars: React.PropTypes.any,
   review: React.PropTypes.string,
   reviewId: React.PropTypes.number,
   reviewIsLoading: React.PropTypes.bool,

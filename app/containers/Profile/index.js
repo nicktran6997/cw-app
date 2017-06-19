@@ -29,9 +29,9 @@ FieldGroup.propTypes = {
 export class Profile extends React.Component {
   constructor(props) {
     super(props);
-    this.firstName = null;
-    this.lastName = null;
-    this.defaultQueryString = null;
+    this.firstName = this.props.Auth.user.first_name;
+    this.lastName = this.props.Auth.user.last_name;
+    this.defaultQueryString = this.props.Auth.user.default_query_string;
     this.currentPassword = null;
     this.onProfileSubmit = this.onProfileSubmit.bind(this);
     this.onChangeFirstName = this.onChangeFirstName.bind(this);
