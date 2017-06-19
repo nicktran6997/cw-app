@@ -65,7 +65,7 @@ const StudySidenav = (props) => (
               <FontAwesome name="chevron-left" />Back to Study
             </Button>
           ) : (
-            <Button onClick={() => props.router.push('/')}>
+            <Button onClick={() => props.router.push('/search')}>
               <FontAwesome name="chevron-left" />Back to Search
             </Button>
           )

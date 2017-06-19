@@ -258,6 +258,8 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
                                 parseInt(this.props.Search.total, 10))}
                   {' '}
                   out of {this.props.Search.total}
+                  {' '}
+                  for <strong>{this.props.Search.query}</strong>
                 </i>
               </Col>
             </Row>
