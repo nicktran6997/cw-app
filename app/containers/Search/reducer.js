@@ -12,6 +12,7 @@ import {
   AGG_REMOVED_ACTION,
   TOGGLE_SORT_ACTION,
   QUERY_CHANGE_ACTION,
+  AGG_BUCKETS_RECEIVED_ACTION,
 } from './constants';
 
 const initialState = fromJS({
@@ -48,6 +49,9 @@ function searchReducer(state = initialState, action) {
       return state
         .set('aggsSent', aggs)
         .set('page', 0);
+    case AGG_BUCKETS_RECEIVED_ACTION:
+      return state
+        .update('aggs', (aggState) => Object.assign(aggState, { [action.agg]: action.data }));
     case TOGGLE_SORT_ACTION:
       switch (state.getIn(['sorts', action.data])) {
         case 'asc':

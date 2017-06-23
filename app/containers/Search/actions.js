@@ -11,6 +11,7 @@ import {
   AGG_REMOVED_ACTION,
   TOGGLE_SORT_ACTION,
   QUERY_CHANGE_ACTION,
+  AGG_BUCKETS_RECEIVED_ACTION,
 } from './constants';
 
 export const searchAction = (dispatch) =>
@@ -40,6 +41,16 @@ export const pageChangeAction = (dispatch) =>
       type: PAGE_CHANGE_ACTION,
       data: args,
     }));
+
+export const allBucketsForAgg = (dispatch) =>
+  (params) =>
+    client.post('/studies/agg_buckets', params)
+      .then((data) =>
+        dispatch({
+          type: AGG_BUCKETS_RECEIVED_ACTION,
+          data: Object.assign(data.data, { loaded: true }),
+          agg: params.agg,
+        }));
 
 export const selectAggAction = (dispatch) =>
   (field, key) =>

@@ -11,3 +11,4 @@ export const AGG_SELECTED_ACTION = '/app/Search/AGG_SELECTED_ACTION';
 export const AGG_REMOVED_ACTION = '/app/Search/AGG_REMOVED_ACTION';
 export const TOGGLE_SORT_ACTION = '/app/Search/TOGGLE_SORT_ACTION';
 export const QUERY_CHANGE_ACTION = '/app/Search/QUERY_CHANGE_ACTION';
+export const AGG_BUCKETS_RECEIVED_ACTION = '/app/Search/AGG_BUCKETS_RECEIVED_ACTION';

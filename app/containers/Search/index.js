@@ -10,29 +10,18 @@ import { Link } from 'react-router';
 import ReactStars from 'react-stars';
 import ReactPaginate from 'react-paginate';
 import { Table, Column, Cell } from 'fixed-data-table';
-import { Row, Col, Form, FormGroup, ButtonGroup, Label,
-  FormControl, Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Row, Col, Form, FormGroup, Label,
+  FormControl, Button } from 'react-bootstrap';
 import Helmet from 'react-helmet';
 import FontAwesome from 'react-fontawesome';
 import { createStructuredSelector } from 'reselect';
+import aggToField from '../../utils/aggToField';
 import SearchWrapper from '../../components/SearchWrapper';
 import AuthButton from '../../components/AuthButton';
+import AggDropdownGroup from '../../components/AggDropdownGroup';
 import { makeSelectAuthState } from '../App/selectors';
 import makeSelectSearch from './selectors';
 import * as actions from './actions';
-
-const aggToField = {
-  average_rating: 'average rating',
-  tags: 'tags',
-  overall_status: 'status',
-  study_type: 'type',
-  sponsors: 'sponsors',
-  facility_names: 'facilities',
-  facility_states: 'states',
-  facility_cities: 'cities',
-  start_date: 'start date',
-  completion_date: 'completion date',
-};
 
 export class Search extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -40,6 +29,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     super(props);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.getAggs = this.getAggs.bind(this);
   }
 
   componentWillMount() {
@@ -60,6 +50,10 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
   getRowCount() {
     return (this.props.Search && this.props.Search.rows
       && this.props.Search.rows.length) || 0;
+  }
+
+  getAggs(agg) {
+    return this.props.onAggViewed({ ...actions.getSearchParams(this.props), agg });
   }
 
   doSearch(props, query) {
@@ -92,41 +86,6 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
       default:
         return (bucketKey);
     }
-  }
-
-  aggDropdown(field) {
-    if (!this.props.Search.aggs || !this.props.Search.aggs[field]) {
-      return '';
-    }
-    let menuItems = '';
-    const buckets = this.props.Search.aggs[field].buckets;
-
-    if (this.props.Search.total && buckets) {
-      menuItems = Object.keys(buckets).map((key) => (
-        <MenuItem
-          key={key}
-          onSelect={() =>
-            this.props.onAggSelected(field, buckets[key].key)
-              .then(() => this.doSearch(this.props))
-            }
-        >
-          {this.keyToInner(field, buckets[key].key)}
-          {' '}
-          ({buckets[key].doc_count})
-        </MenuItem>
-      ));
-    }
-
-    return (
-      <DropdownButton
-        bsStyle="default"
-        title={<b>{aggToField[field]}</b>}
-        key={field}
-        id={`dropdown-basic-${field}`}
-      >
-        {menuItems}
-      </DropdownButton>
-    );
   }
 
   cellInner(field, row) {
@@ -204,30 +163,13 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
           </Col>
         </Row>
         <Row id="search-controls" style={{ marginBottom: '10px' }}>
-          <Col md={8} id="aggs">
-            <Row>
-              <Col md={12}>
-                <ButtonGroup justified>
-                  {this.aggDropdown('average_rating')}
-                  {this.aggDropdown('tags')}
-                  {this.aggDropdown('overall_status')}
-                  {this.aggDropdown('study_type')}
-                  {this.aggDropdown('sponsors')}
-                </ButtonGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
-                <ButtonGroup justified>
-                  {this.aggDropdown('facility_names')}
-                  {this.aggDropdown('facility_states')}
-                  {this.aggDropdown('facility_cities')}
-                  {this.aggDropdown('start_date')}
-                  {this.aggDropdown('completion_date')}
-                </ButtonGroup>
-              </Col>
-            </Row>
-          </Col>
+          <AggDropdownGroup
+            Search={this.props.Search}
+            onAggSelected={this.props.onAggSelected}
+            doSearch={() => this.doSearch(this.props)}
+            keyToInner={this.keyToInner}
+            onAggViewed={(agg) => this.getAggs(agg)}
+          />
           <Col md={4} id="query" className="text-right">
             <Row>
               <Col md={12}>
@@ -345,6 +287,7 @@ Search.propTypes = {
   onAggSelected: PropTypes.func.isRequired,
   onQueryChange: PropTypes.func.isRequired,
   onAggRemoved: PropTypes.func.isRequired,
+  onAggViewed: PropTypes.func.isRequired,
   pageLength: PropTypes.number,
   router: PropTypes.object,
   Auth: PropTypes.object,
@@ -380,6 +323,7 @@ function mapDispatchToProps(dispatch) {
   return {
     search: actions.searchAction(dispatch),
     onPageChange: actions.pageChangeAction(dispatch),
+    onAggViewed: actions.allBucketsForAgg(dispatch),
     onAggSelected: actions.selectAggAction(dispatch),
     onAggRemoved: actions.removeAggAction(dispatch),
     onToggleSort: actions.toggleSortAction(dispatch),
