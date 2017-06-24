@@ -14,6 +14,7 @@ import {
   LOGOUT_ACTION,
   LOGOUT_ERRORS_ACTION,
   IS_LOGGED_IN_ACTION,
+  CLEAR_MODAL_ACTION,
 } from './constants';
 
 export function defaultAction() {
@@ -70,3 +71,9 @@ export const sessionExistsAction = (dispatch) =>
         type: IS_LOGGED_IN_ACTION,
         data: data.data,
       }));
+
+export const clearModalAction = (dispatch) =>
+  () =>
+    dispatch({
+      type: CLEAR_MODAL_ACTION,
+    });

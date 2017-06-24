@@ -9,6 +9,8 @@ import CrowdTab from '../../components/CrowdTab';
 import StudyTab from '../../components/StudyTab';
 import ReviewForm from '../../components/ReviewForm';
 import ReviewList from '../../components/ReviewList';
+import LoginModal from '../../containers/LoginSignup/LoginModal';
+import { SHOULD_OPEN_LOGIN_MODAL } from '../../containers/LoginSignup/constants';
 import { makeSelectAuthState } from '../App/selectors';
 import makeSelectStudy from './selectors';
 import * as actions from './actions';
@@ -199,6 +201,7 @@ export class Study extends React.Component {
             loggedIn={this.props.Auth.loggedIn}
             onTagSubmit={this.onTagSubmit}
             onTagRemove={this.onTagRemove}
+            onAnonymousClick={this.props.onAnonymousClick}
           />
           <Col md={9} id="study-main">
             <Row>
@@ -209,7 +212,10 @@ export class Study extends React.Component {
             {this.getMainView()}
           </Col>
         </Row>
-
+        <LoginModal
+          isOpen={this.props.Auth.shouldOpenLoginModal}
+          contentLabel="Please register or sign in"
+        />
       </div>
     );
   }
@@ -232,6 +238,7 @@ Study.propTypes = {
   onAnnotationRemove: PropTypes.func.isRequired,
   onAnnotationUpdate: PropTypes.func.isRequired,
   onAnnotationCreate: PropTypes.func.isRequired,
+  onAnonymousClick: PropTypes.func.isRequired,
 };
 
 Study.defaultProps = {
@@ -259,6 +266,7 @@ function mapDispatchToProps(dispatch) {
       actions.recruitmentAction(dispatch, nctId)(),
       actions.reviewsAction(dispatch, nctId)(),
     ]),
+    onAnonymousClick: () => dispatch({ type: SHOULD_OPEN_LOGIN_MODAL }),
     onTagSubmit: actions.submitTagAction(dispatch),
     onTagRemove: actions.removeTagAction(dispatch),
     onReviewSubmit: actions.submitReviewAction(dispatch),
