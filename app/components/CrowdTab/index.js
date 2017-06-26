@@ -18,18 +18,26 @@ class CrowdTab extends React.Component {
   }
 
   onAnnotationUpdateSubmit(id) {
-    const p = Promise.resolve();
-    if (this.rowIsUpdating(id)) {
-      p.then(() => this.props.onAnnotationUpdate(id, this.updateRowData[id].description));
+    if (this.props.loggedIn) {
+      const p = Promise.resolve();
+      if (this.rowIsUpdating(id)) {
+        p.then(() => this.props.onAnnotationUpdate(id, this.updateRowData[id].description));
+      }
+      p.then(() => { this.updateableRows[id] = !this.updateableRows[id]; });
+      p.then(() => this.forceUpdate());
+    } else {
+      this.props.onAnonymousClick();
     }
-    p.then(() => { this.updateableRows[id] = !this.updateableRows[id]; });
-    p.then(() => this.forceUpdate());
   }
 
   onAnnotationDelete(id) {
-    this.removedRows[id] = true;
-    this.props.onAnnotationRemove(id)
-      .then(() => this.forceUpdate());
+    if (this.props.loggedIn) {
+      this.removedRows[id] = true;
+      this.props.onAnnotationRemove(id)
+        .then(() => this.forceUpdate());
+    } else {
+      this.props.onAnonymousClick();
+    }
   }
 
   onDescriptionChange(e, id) {
@@ -38,8 +46,12 @@ class CrowdTab extends React.Component {
   }
 
   addAnnotation() {
-    this.isAddingAnnotation = true;
-    this.forceUpdate();
+    if (this.props.loggedIn) {
+      this.isAddingAnnotation = true;
+      this.forceUpdate();
+    } else {
+      this.props.onAnonymousClick();
+    }
   }
 
   createAnnotation() {
@@ -82,14 +94,15 @@ class CrowdTab extends React.Component {
             <td>
               {
                 (this.rowIsUpdating(item.id)) ?
-                  <input
+                  <textarea
                     style={{ width: '100%', border: '1px solid #ccc' }}
                     type="text"
                     defaultValue={item.description}
                     onChange={(e) => this.onDescriptionChange(e, item.id)}
-                    onKeyPress={(e) => {
-                      if (e.charCode === 13) {
-                        this.onAnnotationUpdateSubmit(item.id);
+                    onKeyDown={(e) => {
+                      if (e.keyCode === 27) {
+                        this.updateableRows[item.id] = false;
+                        this.forceUpdate();
                       }
                     }}
                   />
@@ -97,21 +110,17 @@ class CrowdTab extends React.Component {
               }
             </td>
             <td>
-              {this.props.loggedIn ?
-                <Button onClick={() => this.onAnnotationUpdateSubmit(item.id)}>
-                  { this.updateableRows[item.id] ?
-                    'Submit' :
-                    'Update'
-                  }
-                </Button>
-                : null }
+              <Button onClick={() => this.onAnnotationUpdateSubmit(item.id)}>
+                { this.updateableRows[item.id] ?
+                  'Submit' :
+                  'Update'
+                }
+              </Button>
             </td>
             <td>
-              {this.props.loggedIn ?
-                <Button onClick={() => this.onAnnotationDelete(item.id)}>
-                  Delete
-                </Button>
-                : null }
+              <Button onClick={() => this.onAnnotationDelete(item.id)}>
+                Delete
+              </Button>
             </td>
           </tr>)}
           {this.isAddingAnnotation ?
@@ -124,15 +133,10 @@ class CrowdTab extends React.Component {
                 />
               </td>
               <td>
-                <input
+                <textarea
                   style={{ width: '100%', border: '1px solid #ccc' }}
                   placeholder="Add a description..."
                   onChange={(e) => { this.newDescription = e.target.value; }}
-                  onKeyPress={(e) => {
-                    if (e.charCode === 13) {
-                      this.createAnnotation();
-                    }
-                  }}
                 />
               </td>
               <td colSpan={2} className="text-right">
@@ -158,6 +162,7 @@ class CrowdTab extends React.Component {
 CrowdTab.propTypes = {
   data: PropTypes.array,
   loggedIn: PropTypes.bool,
+  onAnonymousClick: PropTypes.func.isRequired,
   onAnnotationCreate: PropTypes.func.isRequired,
   onAnnotationRemove: PropTypes.func.isRequired,
   onAnnotationUpdate: PropTypes.func.isRequired,

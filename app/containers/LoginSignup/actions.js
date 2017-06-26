@@ -33,7 +33,7 @@ export const loginAction = (dispatch) =>
       .then((data) => dispatch({
         type: LOGIN_ACTION,
         data: data.data,
-      }));
+      })).then(sessionExistsAction(dispatch));
 
 export const signupAction = (dispatch) =>
   (params) =>
@@ -47,7 +47,7 @@ export const signupAction = (dispatch) =>
       }).then((data) => dispatch({
         type: SIGNUP_ACTION,
         data: data.data,
-      }));
+      })).then(sessionExistsAction(dispatch));
 
 export const logoutAction = (dispatch) =>
   () =>

@@ -109,6 +109,7 @@ export class Study extends React.Component {
                   <CrowdTab
                     data={this.props.Study[tab]}
                     loggedIn={this.props.Auth.loggedIn}
+                    onAnonymousClick={this.props.onAnonymousClick}
                     onAnnotationRemove={this.onAnnotationRemove}
                     onAnnotationUpdate={this.onAnnotationUpdate}
                     onAnnotationCreate={this.onAnnotationCreate}
@@ -150,7 +151,7 @@ export class Study extends React.Component {
         <ReviewList
           reviews={this.props.Study.reviews}
           nctId={this.props.params.nctId}
-          loggedIn={this.props.Auth.loggedIn}
+          Auth={this.props.Auth}
           onReviewDelete={this.onReviewDelete}
           router={this.props.router}
         />);

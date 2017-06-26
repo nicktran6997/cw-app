@@ -44,7 +44,7 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                     {review.review.comment}
                   </Col>
                   <Col md={3}>
-                    {this.props.loggedIn ?
+                    {this.props.Auth.loggedIn && review.user_id === this.props.Auth.id ?
                       <ButtonGroup>
                         <Button
                           id={`edit-review-${review.review.id}`}
@@ -76,7 +76,7 @@ ReviewList.propTypes = {
   reviews: React.PropTypes.array,
   nctId: React.PropTypes.string,
   onReviewDelete: React.PropTypes.func,
-  loggedIn: React.PropTypes.bool,
+  Auth: React.PropTypes.object,
   router: React.PropTypes.object,
 };
 
