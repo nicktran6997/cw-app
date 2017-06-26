@@ -7,7 +7,12 @@ import { combineReducers } from 'redux-immutable';
 import { fromJS } from 'immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
-  LOGIN_ACTION, SIGNUP_ACTION, LOGOUT_ACTION, IS_LOGGED_IN_ACTION,
+  LOGIN_ACTION,
+  SIGNUP_ACTION,
+  LOGOUT_ACTION,
+  IS_LOGGED_IN_ACTION,
+  SHOULD_OPEN_LOGIN_MODAL,
+  CLEAR_MODAL_ACTION,
 } from './containers/LoginSignup/constants';
 import languageProviderReducer from './containers/LanguageProvider/reducer';
 
@@ -41,13 +46,16 @@ function routeReducer(state = routeInitialState, action) {
 
 const authInitialState = fromJS({
   loggedIn: false,
+  shouldOpenLoginModal: false,
 });
 
 function authReducer(state = authInitialState, action) {
   switch (action.type) {
     case LOGIN_ACTION:
     case SIGNUP_ACTION:
-      return state.set('loggedIn', true);
+      return state
+        .set('loggedIn', true)
+        .set('shouldOpenLoginModal', false);
     case IS_LOGGED_IN_ACTION:
       return state
         .set('loggedIn', action.data.loggedIn)
@@ -56,6 +64,12 @@ function authReducer(state = authInitialState, action) {
       return state
       .set('loggedIn', false)
       .set('user', null);
+    case SHOULD_OPEN_LOGIN_MODAL:
+      return state
+        .set('shouldOpenLoginModal', true);
+    case CLEAR_MODAL_ACTION:
+      return state
+        .set('shouldOpenLoginModal', false);
     default:
       return state;
   }

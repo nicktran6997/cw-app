@@ -29,14 +29,14 @@ const StudySidenav = (props) => (
           >
             View Reviews
           </Button>
-          { props.loggedIn ?
-            <Button
-              onClick={() => props.router.push(`/review/${props.nct_id}`)}
-            >
-              Write a Review
-            </Button>
-            : null
-          }
+          <Button
+            onClick={props.loggedIn
+              ? () => props.router.push(`/review/${props.nct_id}`)
+              : () => props.onAnonymousClick()
+            }
+          >
+            Write a Review
+          </Button>
         </ButtonGroup>
       </Col>
     </Row>
@@ -93,6 +93,7 @@ StudySidenav.propTypes = {
   onTagRemove: PropTypes.func.isRequired,
   /* eslint-disable react/no-unused-prop-types */
   loggedIn: PropTypes.bool,
+  onAnonymousClick: PropTypes.func,
   router: PropTypes.object,
 };
 

@@ -20,14 +20,23 @@ class TagManager extends React.Component {
   }
 
   onTagRemove(e, tagId) {
-    e.persist();
-    this.props.onTagRemove(e, tagId);
+    if (this.props.loggedIn) {
+      e.persist();
+      this.props.onTagRemove(e, tagId);
+    } else {
+      this.props.onAnonymousClick();
+    }
   }
 
   onTagSubmit(e) {
     e.persist();
-    this.props.onTagSubmit(e, this.newTag);
-    this.textInput.value = '';
+    if (this.props.loggedIn) {
+      this.props.onTagSubmit(e, this.newTag);
+      this.textInput.value = '';
+    } else {
+      e.preventDefault();
+      this.props.onAnonymousClick();
+    }
   }
 
   changeNewTag(e) {
@@ -43,15 +52,11 @@ class TagManager extends React.Component {
             {tag.value}
           </td>
           <td>
-            {
-              this.props.loggedIn ?
-                <FontAwesome
-                  name="remove"
-                  style={{ cursor: 'pointer' }}
-                  onClick={(e) => this.onTagRemove(e, tag.id)}
-                />
-                : null
-            }
+            <FontAwesome
+              name="remove"
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => this.onTagRemove(e, tag.id)}
+            />
           </td>
         </tr>
       ));
@@ -70,28 +75,25 @@ class TagManager extends React.Component {
               {existingTags}
             </tbody>
           </Table>
-          {
-            this.props.loggedIn ?
-              <Form inline onSubmit={this.onTagSubmit}>
-                <FormGroup controlId="formInlineEmail">
-                  <FormControl
-                    type="text"
-                    inputRef={(ref) => { this.textInput = ref; }}
-                    onChange={this.changeNewTag}
-                    onKeyPress={(e) => {
-                      if (e.charCode === 13) {
-                        this.onTagSubmit(e);
-                      }
-                    }}
-                  />
-                </FormGroup>
-                {' '}
-                <Button type="submit">
-                  Add Tag
-                </Button>
-              </Form>
-              : null
-          }
+          <Form inline onSubmit={this.onTagSubmit} ref={(ref) => { this.form = ref; }}>
+            <FormGroup controlId="formInlineEmail">
+              <FormControl
+                type="text"
+                inputRef={(ref) => { this.textInput = ref; }}
+                onFocus={this.onFocus}
+                onChange={this.changeNewTag}
+                onKeyPress={(e) => {
+                  if (e.charCode === 13) {
+                    this.onTagSubmit(e);
+                  }
+                }}
+              />
+            </FormGroup>
+            {' '}
+            <Button type="submit">
+              Add Tag
+            </Button>
+          </Form>
         </Col>
       </Row>
     );
@@ -104,6 +106,7 @@ TagManager.propTypes = {
   tags: React.PropTypes.arrayOf(React.PropTypes.object),
   onTagRemove: React.PropTypes.func,
   onTagSubmit: React.PropTypes.func,
+  onAnonymousClick: React.PropTypes.func,
   loggedIn: React.PropTypes.bool,
 };
 

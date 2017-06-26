@@ -114,6 +114,8 @@ export default function createRoutes(store) {
         const importModules = Promise.all([
           import('containers/Study/reducer'),
           import('containers/Study'),
+          import('containers/LoginSignup/reducer'),
+          import('containers/LoginSignup/LoginModal'),
         ]);
 
         const renderRoute = loadModule(cb);
@@ -169,6 +171,8 @@ export default function createRoutes(store) {
         const importModules = Promise.all([
           import('containers/Study/reducer'),
           import('containers/Study'),
+          import('containers/LoginSignup/reducer'),
+          import('containers/LoginSignup/LoginModal'),
         ]);
 
         const renderRoute = loadModule(cb);
@@ -188,6 +192,8 @@ export default function createRoutes(store) {
         const importModules = Promise.all([
           import('containers/Study/reducer'),
           import('containers/Study'),
+          import('containers/LoginSignup/reducer'),
+          import('containers/LoginSignup/LoginModal'),
         ]);
 
         const renderRoute = loadModule(cb);
@@ -207,6 +213,8 @@ export default function createRoutes(store) {
         const importModules = Promise.all([
           import('containers/Study/reducer'),
           import('containers/Study'),
+          import('containers/LoginSignup/reducer'),
+          import('containers/LoginSignup/LoginModal'),
         ]);
 
         const renderRoute = loadModule(cb);

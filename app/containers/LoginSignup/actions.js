@@ -14,6 +14,7 @@ import {
   LOGOUT_ACTION,
   LOGOUT_ERRORS_ACTION,
   IS_LOGGED_IN_ACTION,
+  CLEAR_MODAL_ACTION,
 } from './constants';
 
 export function defaultAction() {
@@ -32,7 +33,7 @@ export const loginAction = (dispatch) =>
       .then((data) => dispatch({
         type: LOGIN_ACTION,
         data: data.data,
-      }));
+      })).then(sessionExistsAction(dispatch));
 
 export const signupAction = (dispatch) =>
   (params) =>
@@ -46,7 +47,7 @@ export const signupAction = (dispatch) =>
       }).then((data) => dispatch({
         type: SIGNUP_ACTION,
         data: data.data,
-      }));
+      })).then(sessionExistsAction(dispatch));
 
 export const logoutAction = (dispatch) =>
   () =>
@@ -70,3 +71,9 @@ export const sessionExistsAction = (dispatch) =>
         type: IS_LOGGED_IN_ACTION,
         data: data.data,
       }));
+
+export const clearModalAction = (dispatch) =>
+  () =>
+    dispatch({
+      type: CLEAR_MODAL_ACTION,
+    });
