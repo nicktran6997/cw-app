@@ -39,9 +39,14 @@ function searchReducer(state = initialState, action) {
     case PAGE_CHANGE_ACTION:
       return state.set('page', action.data.selected);
     case AGG_SELECTED_ACTION:
-      return state.set('aggsSent',
-        Object.assign({}, action.data, state.get('aggsSent')))
-        .set('page', 0);
+      return state
+        .update('aggsSent', (as) => Object.assign(as, {
+          [action.field]: Object.assign({}, { [action.key]: 1 }, as[action.field]),
+        }))
+        .set('page', 0)
+        .update('aggs', (as) =>
+          Object.assign(...Object.keys(as).map((key) =>
+            Object.assign(as[key], { loaded: false }))));
     /* eslint-disable no-case-declarations */
     case AGG_REMOVED_ACTION:
       const aggs = state.get('aggsSent');
@@ -51,7 +56,8 @@ function searchReducer(state = initialState, action) {
         .set('page', 0);
     case AGG_BUCKETS_RECEIVED_ACTION:
       return state
-        .update('aggs', (aggState) => Object.assign(aggState, { [action.agg]: action.data }));
+        .update('aggs', (aggState) =>
+          Object.assign(aggState, { [action.agg]: Object.assign({ loaded: true }, action.data) }));
     case TOGGLE_SORT_ACTION:
       switch (state.getIn(['sorts', action.data])) {
         case 'asc':

@@ -56,7 +56,8 @@ export const selectAggAction = (dispatch) =>
   (field, key) =>
     Promise.resolve(dispatch({
       type: AGG_SELECTED_ACTION,
-      data: { [field]: { [key]: 1 } },
+      field,
+      key,
     }));
 
 export const removeAggAction = (dispatch) =>

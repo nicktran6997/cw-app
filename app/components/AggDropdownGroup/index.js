@@ -24,8 +24,8 @@ class AggDropdownGroup extends React.Component { // eslint-disable-line react/pr
               <AggDropdown {...this.props} field="facility_names" />
               <AggDropdown {...this.props} field="facility_states" />
               <AggDropdown {...this.props} field="facility_cities" />
-              <AggDropdown {...this.props} field="start_date" />
-              <AggDropdown {...this.props} field="completion_date" />
+              <AggDropdown {...this.props} field="browse_condition_mesh_terms" />
+              <AggDropdown {...this.props} field="phase" />
             </ButtonGroup>
           </Col>
         </Row>

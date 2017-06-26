@@ -9,4 +9,6 @@ export default {
   facility_cities: 'cities',
   start_date: 'start date',
   completion_date: 'completion date',
+  phase: 'phase',
+  browse_condition_mesh_terms: 'mesh term',
 };
