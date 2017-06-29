@@ -43,10 +43,7 @@ function searchReducer(state = initialState, action) {
         .update('aggsSent', (as) => Object.assign(as, {
           [action.field]: Object.assign({}, { [action.key]: 1 }, as[action.field]),
         }))
-        .set('page', 0)
-        .update('aggs', (as) =>
-          Object.assign(...Object.keys(as).map((key) =>
-            Object.assign(as[key], { loaded: false }))));
+        .set('page', 0);
     /* eslint-disable no-case-declarations */
     case AGG_REMOVED_ACTION:
       const aggs = state.get('aggsSent');
@@ -61,11 +58,11 @@ function searchReducer(state = initialState, action) {
     case TOGGLE_SORT_ACTION:
       switch (state.getIn(['sorts', action.data])) {
         case 'asc':
-          return state.setIn(['sorts', action.data], 'desc');
-        case 'desc':
           return state.deleteIn(['sorts', action.data]);
-        default:
+        case 'desc':
           return state.setIn(['sorts', action.data], 'asc');
+        default:
+          return state.setIn(['sorts', action.data], 'desc');
       }
     case QUERY_CHANGE_ACTION:
       return state
