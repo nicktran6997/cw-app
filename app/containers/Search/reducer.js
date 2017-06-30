@@ -43,7 +43,14 @@ function searchReducer(state = initialState, action) {
         .update('aggsSent', (as) => Object.assign(as, {
           [action.field]: Object.assign({}, { [action.key]: 1 }, as[action.field]),
         }))
-        .set('page', 0);
+        .set('page', 0)
+        .update('aggs', (as) => {
+          const newAggs = as;
+          Object.keys(as).forEach((k) => {
+            newAggs[k].loaded = false;
+          });
+          return newAggs;
+        });
     /* eslint-disable no-case-declarations */
     case AGG_REMOVED_ACTION:
       const aggs = state.get('aggsSent');
