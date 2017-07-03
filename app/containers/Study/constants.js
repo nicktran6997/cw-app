@@ -4,6 +4,8 @@
  *
  */
 
+export const REQUEST_STUDY_ACTION = 'app/Study/REQUEST_STUDY_ACTION';
+export const RELOAD_STUDY_ACTION = 'app/Study/RELOAD_STUDY_ACTION';
 export const DEFAULT_ACTION = 'app/Study/DEFAULT_ACTION';
 export const CROWD_ACTION = 'app/Study/CROWD_ACTION';
 export const DESCRIPTIVE_ACTION = 'app/Study/DESCRIPTIVE_ACTION';

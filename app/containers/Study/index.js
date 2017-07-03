@@ -253,20 +253,8 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    reload: (nctId) => Promise.all([
-      actions.defaultAction(dispatch, nctId)(),
-      actions.reviewsAction(dispatch, nctId)(),
-      actions.crowdAction(dispatch, nctId)(),
-    ]),
-    getStudy: (nctId) => Promise.all([
-      actions.defaultAction(dispatch, nctId)(),
-      actions.crowdAction(dispatch, nctId)(),
-      actions.trackingAction(dispatch, nctId)(),
-      actions.descriptiveAction(dispatch, nctId)(),
-      actions.adminAction(dispatch, nctId)(),
-      actions.recruitmentAction(dispatch, nctId)(),
-      actions.reviewsAction(dispatch, nctId)(),
-    ]),
+    reload: (nctId) => dispatch(actions.reloadStudyAction(nctId)),
+    getStudy: (nctId) => dispatch(actions.getStudyAction(nctId)),
     onAnonymousClick: () => dispatch({ type: SHOULD_OPEN_LOGIN_MODAL }),
     onTagSubmit: actions.submitTagAction(dispatch),
     onTagRemove: actions.removeTagAction(dispatch),
