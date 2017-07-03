@@ -35,12 +35,18 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
 
   onWikiSubmit(e) {
     e.preventDefault();
+    if (!this.props.loggedIn) {
+      return this.props.onAnonymousClick();
+    }
     this.props.onWikiSubmit(this.state.value.toString('markdown'));
-    this.toggleEditable();
+    return this.toggleEditable();
   }
 
   toggleEditable() {
-    this.setState({ editable: !this.state.editable });
+    if (!this.props.loggedIn) {
+      return this.props.onAnonymousClick();
+    }
+    return this.setState({ editable: !this.state.editable });
   }
 
   renderSubmitButton() {
@@ -118,6 +124,8 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
 WikiTab.propTypes = {
   wiki: PropTypes.object,
   onWikiSubmit: PropTypes.func,
+  onAnonymousClick: PropTypes.func,
+  loggedIn: PropTypes.bool,
 };
 
 WikiTab.defaultProps = {
