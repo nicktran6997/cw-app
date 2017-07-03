@@ -21,61 +21,62 @@ import {
   ANNOTATION_CREATE_ACTION,
   ANNOTATION_DELETE_ACTION,
   ANNOTATION_UPDATE_ACTION,
+  REQUEST_STUDY_ACTION,
+  RELOAD_STUDY_ACTION,
+  WIKI_ACTION,
+  WIKI_SUBMIT_ACTION,
 } from './constants';
 
-export const defaultAction = (dispatch, nctId) =>
-  () =>
-    client.get(`/studies/${nctId}/json`)
-    .then((data) =>
-      dispatch({
-        type: DEFAULT_ACTION,
-        data: data.data,
-      }));
+export const getStudyAction = (nctId) => ({
+  type: REQUEST_STUDY_ACTION,
+  nctId,
+});
 
-export const crowdAction = (dispatch, nctId) =>
-  () =>
-    client.get(`/studies/${nctId}/crowd`)
-    .then((data) =>
-      dispatch({
-        type: CROWD_ACTION,
-        data: data.data,
-      }));
+export const reloadStudyAction = (nctId) => ({
+  type: RELOAD_STUDY_ACTION,
+  nctId,
+});
 
-export const trackingAction = (dispatch, nctId) =>
-  () =>
-    client.get(`/studies/${nctId}/tracking`)
-    .then((data) =>
-      dispatch({
-        type: TRACKING_ACTION,
-        data: data.data,
-      }));
+export const wikiAction = (data) => ({
+  type: WIKI_ACTION,
+  data,
+});
 
-export const descriptiveAction = (dispatch, nctId) =>
-  () =>
-    client.get(`/studies/${nctId}/descriptive`)
-    .then((data) =>
-      dispatch({
-        type: DESCRIPTIVE_ACTION,
-        data: data.data,
-      }));
+export const wikiSubmitAction = (nctId, wikiText) => ({
+  type: WIKI_SUBMIT_ACTION,
+  nctId,
+  wikiText,
+});
 
-export const adminAction = (dispatch, nctId) =>
-  () =>
-    client.get(`/studies/${nctId}/administrative`)
-    .then((data) =>
-      dispatch({
-        type: ADMINISTRATIVE_ACTION,
-        data: data.data,
-      }));
+export const defaultAction = (data) => ({
+  type: DEFAULT_ACTION,
+  data,
+});
 
-export const recruitmentAction = (dispatch, nctId) =>
-  () =>
-    client.get(`/studies/${nctId}/recruitment`)
-    .then((data) =>
-      dispatch({
-        type: RECRUITMENT_ACTION,
-        data: data.data,
-      }));
+export const crowdAction = (data) => ({
+  type: CROWD_ACTION,
+  data,
+});
+
+export const trackingAction = (data) => ({
+  type: TRACKING_ACTION,
+  data,
+});
+
+export const descriptiveAction = (data) => ({
+  type: DESCRIPTIVE_ACTION,
+  data,
+});
+
+export const adminAction = (data) => ({
+  type: ADMINISTRATIVE_ACTION,
+  data,
+});
+
+export const recruitmentAction = (data) => ({
+  type: RECRUITMENT_ACTION,
+  data,
+});
 
 export const removeTagAction = (dispatch) =>
   (nctId, tagId) =>
@@ -135,13 +136,10 @@ export const updateReviewAction = (dispatch) =>
         type: REVIEW_UPDATE_ACTION,
       }));
 
-export const reviewsAction = (dispatch, nctId) =>
-  () =>
-    client.get(`reviews.json?nct_id=${nctId}`)
-      .then((data) => dispatch({
-        type: REVIEWS_RECEIVE_ACTION,
-        data: data.data,
-      }));
+export const reviewsAction = (data) => ({
+  type: REVIEWS_RECEIVE_ACTION,
+  data,
+});
 
 export const getReviewAction = (dispatch) =>
   (reviewId) =>

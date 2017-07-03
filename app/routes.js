@@ -113,6 +113,7 @@ export default function createRoutes(store) {
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/Study/reducer'),
+          import('containers/Study/sagas'),
           import('containers/Study'),
           import('containers/LoginSignup/reducer'),
           import('containers/LoginSignup/LoginModal'),
@@ -120,8 +121,9 @@ export default function createRoutes(store) {
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, component]) => {
+        importModules.then(([reducer, sagas, component]) => {
           injectReducer('study', reducer.default);
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 

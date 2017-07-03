@@ -9,6 +9,7 @@ import CrowdTab from '../../components/CrowdTab';
 import StudyTab from '../../components/StudyTab';
 import ReviewForm from '../../components/ReviewForm';
 import ReviewList from '../../components/ReviewList';
+import WikiTab from '../../components/WikiTab';
 import LoginModal from '../../containers/LoginSignup/LoginModal';
 import { SHOULD_OPEN_LOGIN_MODAL } from '../../containers/LoginSignup/constants';
 import { makeSelectAuthState } from '../App/selectors';
@@ -16,12 +17,13 @@ import makeSelectStudy from './selectors';
 import * as actions from './actions';
 
 const defaultTabs = [
-  'crowd', 'descriptive', 'administrative', 'recruitment', 'tracking',
+  'wiki', 'crowd', 'descriptive', 'administrative', 'recruitment', 'tracking',
 ];
 
 export class Study extends React.Component {
   constructor(props) {
     super(props);
+    this.onWikiSubmit = this.onWikiSubmit.bind(this);
     this.onTagSubmit = this.onTagSubmit.bind(this);
     this.onTagRemove = this.onTagRemove.bind(this);
     this.onAnnotationCreate = this.onAnnotationCreate.bind(this);
@@ -53,6 +55,10 @@ export class Study extends React.Component {
       this.props.onTagSubmit(this.props.params.nctId, newTag)
         .then(this.reload);
     }
+  }
+
+  onWikiSubmit(newWikiText) {
+    this.props.onWikiSubmit(this.props.params.nctId, newWikiText);
   }
 
   onTagRemove(e, tagId) {
@@ -94,6 +100,31 @@ export class Study extends React.Component {
       .then(() => this.props.router.push(`/reviews/${nctId}`));
   }
 
+  getTab(tab) {
+    switch (tab) {
+      case 'crowd':
+        return (
+          <CrowdTab
+            data={this.props.Study.crowd}
+            loggedIn={this.props.Auth.loggedIn}
+            onAnonymousClick={this.props.onAnonymousClick}
+            onAnnotationRemove={this.onAnnotationRemove}
+            onAnnotationUpdate={this.onAnnotationUpdate}
+            onAnnotationCreate={this.onAnnotationCreate}
+          />);
+      case 'wiki':
+        return (
+          <WikiTab
+            wiki={this.props.Study.wiki}
+            loggedIn={this.props.Auth.loggedIn}
+            onAnonymousClick={this.props.onAnonymousClick}
+            onWikiSubmit={this.onWikiSubmit}
+          />);
+      default:
+        return (<StudyTab data={this.props.Study[tab]} />);
+    }
+  }
+
   getStudyTabs() {
     return (
       <Tabs defaultActiveKey={this.tabs[0]} id="study-tabs-main">
@@ -102,20 +133,10 @@ export class Study extends React.Component {
             <Tab
               key={tab}
               eventKey={tab}
-              title={`${tab} info`.toUpperCase()}
+              title={tab.toUpperCase()}
             >
               <Well style={{ background: 'rgba(240, 240, 240, 0.5)' }}>
-                { tab === 'crowd' ?
-                  <CrowdTab
-                    data={this.props.Study[tab]}
-                    loggedIn={this.props.Auth.loggedIn}
-                    onAnonymousClick={this.props.onAnonymousClick}
-                    onAnnotationRemove={this.onAnnotationRemove}
-                    onAnnotationUpdate={this.onAnnotationUpdate}
-                    onAnnotationCreate={this.onAnnotationCreate}
-                  />
-                : <StudyTab data={this.props.Study[tab]} />
-                }
+                { this.getTab(tab) }
               </Well>
             </Tab>
           ))
@@ -240,6 +261,7 @@ Study.propTypes = {
   onAnnotationUpdate: PropTypes.func.isRequired,
   onAnnotationCreate: PropTypes.func.isRequired,
   onAnonymousClick: PropTypes.func.isRequired,
+  onWikiSubmit: PropTypes.func.isRequired,
 };
 
 Study.defaultProps = {
@@ -253,20 +275,9 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    reload: (nctId) => Promise.all([
-      actions.defaultAction(dispatch, nctId)(),
-      actions.reviewsAction(dispatch, nctId)(),
-      actions.crowdAction(dispatch, nctId)(),
-    ]),
-    getStudy: (nctId) => Promise.all([
-      actions.defaultAction(dispatch, nctId)(),
-      actions.crowdAction(dispatch, nctId)(),
-      actions.trackingAction(dispatch, nctId)(),
-      actions.descriptiveAction(dispatch, nctId)(),
-      actions.adminAction(dispatch, nctId)(),
-      actions.recruitmentAction(dispatch, nctId)(),
-      actions.reviewsAction(dispatch, nctId)(),
-    ]),
+    reload: (nctId) => dispatch(actions.reloadStudyAction(nctId)),
+    getStudy: (nctId) => dispatch(actions.getStudyAction(nctId)),
+    onWikiSubmit: (nctId, wikiText) => dispatch(actions.wikiSubmitAction(nctId, wikiText)),
     onAnonymousClick: () => dispatch({ type: SHOULD_OPEN_LOGIN_MODAL }),
     onTagSubmit: actions.submitTagAction(dispatch),
     onTagRemove: actions.removeTagAction(dispatch),

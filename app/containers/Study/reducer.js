@@ -14,6 +14,7 @@ import {
   RECRUITMENT_ACTION,
   REVIEWS_RECEIVE_ACTION,
   REVIEW_RECEIVE_ACTION,
+  WIKI_ACTION,
 } from './constants';
 
 const initialState = fromJS({});
@@ -36,6 +37,8 @@ function studyReducer(state = initialState, action) {
       return state.set('reviews', action.data);
     case REVIEW_RECEIVE_ACTION:
       return state.set('review', action.data);
+    case WIKI_ACTION:
+      return state.set('wiki', action.data);
     default:
       return state;
   }
