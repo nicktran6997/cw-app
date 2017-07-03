@@ -37,32 +37,32 @@ export const reloadStudyAction = (nctId) => ({
 
 export const defaultAction = (data) => ({
   type: DEFAULT_ACTION,
-  data: data.data,
+  data,
 });
 
 export const crowdAction = (data) => ({
   type: CROWD_ACTION,
-  data: data.data,
+  data,
 });
 
 export const trackingAction = (data) => ({
   type: TRACKING_ACTION,
-  data: data.data,
+  data,
 });
 
 export const descriptiveAction = (data) => ({
   type: DESCRIPTIVE_ACTION,
-  data: data.data,
+  data,
 });
 
 export const adminAction = (data) => ({
   type: ADMINISTRATIVE_ACTION,
-  data: data.data,
+  data,
 });
 
 export const recruitmentAction = (data) => ({
   type: RECRUITMENT_ACTION,
-  data: data.data,
+  data,
 });
 
 export const removeTagAction = (dispatch) =>
@@ -125,7 +125,7 @@ export const updateReviewAction = (dispatch) =>
 
 export const reviewsAction = (data) => ({
   type: REVIEWS_RECEIVE_ACTION,
-  data: data.data,
+  data,
 });
 
 export const getReviewAction = (dispatch) =>
