@@ -2,6 +2,7 @@ import { put, takeEvery, call } from 'redux-saga/effects';
 import {
   REQUEST_STUDY_ACTION,
   RELOAD_STUDY_ACTION,
+  WIKI_SUBMIT_ACTION,
 } from './constants';
 import {
   defaultAction,
@@ -11,6 +12,7 @@ import {
   adminAction,
   recruitmentAction,
   reviewsAction,
+  wikiAction,
 } from './actions';
 import client from '../../utils/client';
 
@@ -49,8 +51,14 @@ export function* loadReviews(action) {
   yield put(reviewsAction(data.data));
 }
 
+export function* loadWiki(action) {
+  const data = yield client.get(`/studies/${action.nctId}/wiki`);
+  yield put(wikiAction(data.data));
+}
+
 export function* loadStudy(action) {
   yield call(loadDefault, action);
+  yield call(loadWiki, action);
   yield call(loadCrowd, action);
   yield call(loadTracking, action);
   yield call(loadDescriptive, action);
@@ -61,13 +69,23 @@ export function* loadStudy(action) {
 
 export function* reloadStudy(action) {
   yield call(loadDefault, action);
+  yield call(loadWiki, action);
   yield call(loadReviews, action);
   yield call(loadCrowd, action);
+}
+
+export function* submitWiki(action) {
+  yield client.post(
+    `/studies/${action.nctId}/wiki`,
+    { wiki_text: action.wikiText }
+  );
+  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
 }
 
 export function* studySaga() {
   yield takeEvery(REQUEST_STUDY_ACTION, loadStudy);
   yield takeEvery(RELOAD_STUDY_ACTION, reloadStudy);
+  yield takeEvery(WIKI_SUBMIT_ACTION, submitWiki);
 }
 
 export default [
