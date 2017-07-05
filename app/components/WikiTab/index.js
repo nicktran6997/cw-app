@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import RichTextEditor from 'react-rte';
 import FontAwesome from 'react-fontawesome';
 import styled from 'styled-components';
-import { Button, Row, Col, Table } from 'react-bootstrap';
+import { Button, Row, Col, Table, FormGroup, FormControl } from 'react-bootstrap';
 
 const CREATE_WIKI = `
 # No wiki exists for this study.
@@ -29,16 +29,20 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
+    this.onChangeMarkdown = this.onChangeMarkdown.bind(this);
     this.onWikiSubmit = this.onWikiSubmit.bind(this);
     this.toggleEditable = this.toggleEditable.bind(this);
     this.toggleHistory = this.toggleHistory.bind(this);
+    this.toggleMarkdown = this.toggleMarkdown.bind(this);
   }
 
   state = {
+    markdown: false,
     editable: false,
     changed: false,
     history: false,
     value: RichTextEditor.createValueFromString(CREATE_WIKI, 'markdown'),
+    markdownValue: CREATE_WIKI,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -53,12 +57,24 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
     this.setState({ value, changed: true });
   }
 
+  onChangeMarkdown(e) {
+    e.persist();
+    this.setState({
+      markdownValue: e.target.value,
+      changed: true,
+    });
+  }
+
   onWikiSubmit(e) {
     e.preventDefault();
     if (!this.props.loggedIn) {
       return this.props.onAnonymousClick();
     }
-    this.props.onWikiSubmit(this.state.value.toString('markdown'));
+    if (this.state.markdown) {
+      this.props.onWikiSubmit(this.state.markdownValue);
+    } else {
+      this.props.onWikiSubmit(this.state.value.toString('markdown'));
+    }
     return this.toggleEditable();
   }
 
@@ -74,7 +90,32 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
     if (!this.props.loggedIn) {
       return this.props.onAnonymousClick();
     }
+
+    if (this.state.editable && this.state.markdown) {
+      // cache markdown changes into rte
+      return this.setState({
+        value: RichTextEditor.createValueFromString(this.state.markdownValue, 'markdown'),
+        editable: false,
+        history: false,
+        markdown: false,
+      });
+    }
     return this.setState({ editable: !this.state.editable, history: false });
+  }
+
+  toggleMarkdown() {
+    if (this.state.markdown) {
+      // switch markdown to rte
+      this.setState({
+        markdown: false,
+        value: RichTextEditor.createValueFromString(this.state.markdownValue, 'markdown'),
+      });
+    }
+    // switch rte to markdown
+    return this.setState({
+      markdown: true,
+      markdownValue: this.state.value.toString('markdown'),
+    });
   }
 
   toggleHistory() {
@@ -105,6 +146,42 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
       >
         History <FontAwesome name="history" />
       </Button>
+    );
+  }
+
+  renderMarkdownButton() {
+    if (this.state.markdown) {
+      return (
+        <Button type="button" onClick={this.toggleMarkdown}>
+          Editor <FontAwesome name="newspaper-o" />
+        </Button>
+      );
+    }
+    return (
+      <Button type="button" onClick={this.toggleMarkdown}>
+        Markdown <FontAwesome name="code" />
+      </Button>
+    );
+  }
+
+  renderEditor() {
+    if (this.state.markdown) {
+      return (
+        <FormGroup controlId="formControlsTextarea">
+          <FormControl
+            style={{ minHeight: '200px' }}
+            componentClass="textarea"
+            defaultValue={this.state.value.toString('markdown')}
+            onChange={this.onChangeMarkdown}
+          />
+        </FormGroup>
+      );
+    }
+    return (
+      <RichTextEditor
+        onChange={this.onChange}
+        value={this.state.value}
+      />
     );
   }
 
@@ -170,7 +247,11 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
                 paddingRight: '5px',
               }}
               /* eslint-disable react/no-danger */
-              dangerouslySetInnerHTML={{ __html: this.state.value.toString('html') }}
+              dangerouslySetInnerHTML={{
+                __html: this.state.changed
+                ? this.state.value.toString('html')
+                : this.props.wiki.text_html,
+              }}
             />
           </Col>
         </Row>
@@ -192,15 +273,13 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
       <form>
         <Row>
           <Col md={12}>
-            <RichTextEditor
-              onChange={this.onChange}
-              value={this.state.value}
-            />
+            {this.renderEditor()}
           </Col>
         </Row>
         <Row style={{ paddingTop: '10px' }}>
           <Col md={12} className="text-right">
-            <Button type="button" onClick={this.toggleEditable}>
+            {this.renderMarkdownButton()}
+            <Button type="button" onClick={this.toggleEditable} style={{ marginLeft: '10px' }}>
               Preview <FontAwesome name="photo" />
             </Button>
             {this.renderSubmitButton()}
