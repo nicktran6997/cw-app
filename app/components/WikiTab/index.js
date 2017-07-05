@@ -248,9 +248,9 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
               }}
               /* eslint-disable react/no-danger */
               dangerouslySetInnerHTML={{
-                __html: this.state.changed
-                ? this.state.value.toString('html')
-                : this.props.wiki.text_html,
+                __html: (!this.state.changed && this.props.wiki.text_html)
+                ? this.props.wiki.text_html
+                : this.state.value.toString('html'),
               }}
             />
           </Col>
