@@ -38,7 +38,7 @@ function studyReducer(state = initialState, action) {
     case REVIEW_RECEIVE_ACTION:
       return state.set('review', action.data);
     case WIKI_ACTION:
-      return state.set('wiki', action.data);
+      return state.set('wiki', fromJS(action.data));
     default:
       return state;
   }

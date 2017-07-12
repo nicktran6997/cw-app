@@ -13,7 +13,7 @@ import WikiTab from '../../components/WikiTab';
 import LoginModal from '../../containers/LoginSignup/LoginModal';
 import { SHOULD_OPEN_LOGIN_MODAL } from '../../containers/LoginSignup/constants';
 import { makeSelectAuthState } from '../App/selectors';
-import makeSelectStudy from './selectors';
+import makeSelectStudy, { makeSelectWiki, makeSelectWikiMeta } from './selectors';
 import * as actions from './actions';
 
 const defaultTabs = [
@@ -105,7 +105,7 @@ export class Study extends React.Component {
       case 'crowd':
         return (
           <CrowdTab
-            data={this.props.Study.crowd}
+            data={this.props.WikiMeta}
             loggedIn={this.props.Auth.loggedIn}
             onAnonymousClick={this.props.onAnonymousClick}
             onAnnotationRemove={this.onAnnotationRemove}
@@ -115,7 +115,7 @@ export class Study extends React.Component {
       case 'wiki':
         return (
           <WikiTab
-            wiki={this.props.Study.wiki}
+            wiki={this.props.Wiki}
             loggedIn={this.props.Auth.loggedIn}
             onAnonymousClick={this.props.onAnonymousClick}
             onWikiSubmit={this.onWikiSubmit}
@@ -262,6 +262,8 @@ Study.propTypes = {
   onAnnotationCreate: PropTypes.func.isRequired,
   onAnonymousClick: PropTypes.func.isRequired,
   onWikiSubmit: PropTypes.func.isRequired,
+  Wiki: PropTypes.object,
+  WikiMeta: PropTypes.object,
 };
 
 Study.defaultProps = {
@@ -270,6 +272,8 @@ Study.defaultProps = {
 
 const mapStateToProps = createStructuredSelector({
   Study: makeSelectStudy(),
+  Wiki: makeSelectWiki(),
+  WikiMeta: makeSelectWikiMeta(),
   Auth: makeSelectAuthState(),
 });
 

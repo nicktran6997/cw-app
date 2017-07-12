@@ -1,4 +1,5 @@
-import { put, takeEvery, call } from 'redux-saga/effects';
+import { put, takeEvery, call, take, cancel } from 'redux-saga/effects';
+import { LOCATION_CHANGE } from 'react-router-redux';
 import {
   REQUEST_STUDY_ACTION,
   RELOAD_STUDY_ACTION,
@@ -6,7 +7,6 @@ import {
 } from './constants';
 import {
   defaultAction,
-  crowdAction,
   trackingAction,
   descriptiveAction,
   adminAction,
@@ -19,11 +19,6 @@ import client from '../../utils/client';
 export function* loadDefault(action) {
   const data = yield client.get(`/studies/${action.nctId}/json`);
   yield put(defaultAction(data.data));
-}
-
-export function* loadCrowd(action) {
-  const data = yield client.get(`/studies/${action.nctId}/crowd`);
-  yield put(crowdAction(data.data));
 }
 
 export function* loadTracking(action) {
@@ -59,7 +54,6 @@ export function* loadWiki(action) {
 export function* loadStudy(action) {
   yield call(loadDefault, action);
   yield call(loadWiki, action);
-  yield call(loadCrowd, action);
   yield call(loadTracking, action);
   yield call(loadDescriptive, action);
   yield call(loadAdmin, action);
@@ -71,7 +65,6 @@ export function* reloadStudy(action) {
   yield call(loadDefault, action);
   yield call(loadWiki, action);
   yield call(loadReviews, action);
-  yield call(loadCrowd, action);
 }
 
 export function* submitWiki(action) {
@@ -83,9 +76,15 @@ export function* submitWiki(action) {
 }
 
 export function* studySaga() {
-  yield takeEvery(REQUEST_STUDY_ACTION, loadStudy);
-  yield takeEvery(RELOAD_STUDY_ACTION, reloadStudy);
-  yield takeEvery(WIKI_SUBMIT_ACTION, submitWiki);
+  const requestWatcher = yield takeEvery(REQUEST_STUDY_ACTION, loadStudy);
+  const reloadWatcher = yield takeEvery(RELOAD_STUDY_ACTION, reloadStudy);
+  const submitWatcher = yield takeEvery(WIKI_SUBMIT_ACTION, submitWiki);
+
+  yield take(LOCATION_CHANGE);
+
+  yield cancel(requestWatcher);
+  yield cancel(reloadWatcher);
+  yield cancel(submitWatcher);
 }
 
 export default [
