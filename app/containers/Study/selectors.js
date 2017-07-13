@@ -30,9 +30,15 @@ const makeSelectWiki = () => createSelector(
   (substate) => substate.get('wiki', fromJS({})).toJS()
 );
 
+const makeSelectWikiOverride = () => createSelector(
+  selectStudyDomain(),
+  (substate) => substate.get('wikiOverride', true)
+);
+
 export default makeSelectStudy;
 export {
   selectStudyDomain,
   makeSelectWikiMeta,
   makeSelectWiki,
+  makeSelectWikiOverride,
 };

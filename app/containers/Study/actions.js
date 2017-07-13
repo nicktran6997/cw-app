@@ -25,7 +25,14 @@ import {
   RELOAD_STUDY_ACTION,
   WIKI_ACTION,
   WIKI_SUBMIT_ACTION,
+  SET_WIKI_OVERRIDE_ACTION,
 } from './constants';
+
+export const onWikiOverrideAction = (nctId, shouldOverride) => ({
+  type: SET_WIKI_OVERRIDE_ACTION,
+  nctId,
+  shouldOverride,
+});
 
 export const getStudyAction = (nctId) => ({
   type: REQUEST_STUDY_ACTION,

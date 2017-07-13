@@ -13,7 +13,7 @@ import WikiTab from '../../components/WikiTab';
 import LoginModal from '../../containers/LoginSignup/LoginModal';
 import { SHOULD_OPEN_LOGIN_MODAL } from '../../containers/LoginSignup/constants';
 import { makeSelectAuthState } from '../App/selectors';
-import makeSelectStudy, { makeSelectWiki, makeSelectWikiMeta } from './selectors';
+import makeSelectStudy, { makeSelectWiki, makeSelectWikiMeta, makeSelectWikiOverride } from './selectors';
 import * as actions from './actions';
 
 const defaultTabs = [
@@ -82,6 +82,7 @@ export class Study extends React.Component {
         return (
           <WikiTab
             wiki={this.props.Wiki}
+            nctId={this.props.params.nctId}
             loggedIn={this.props.Auth.loggedIn}
             onAnonymousClick={this.props.onAnonymousClick}
             onWikiSubmit={this.props.onWikiSubmit}
@@ -190,6 +191,8 @@ export class Study extends React.Component {
             onTagSubmit={this.props.onTagSubmit}
             onTagRemove={this.props.onTagRemove}
             onAnonymousClick={this.props.onAnonymousClick}
+            wikiOverride={this.props.wikiOverride}
+            onWikiOverride={this.props.onWikiOverride}
           />
           <Col md={9} id="study-main">
             <Row>
@@ -230,6 +233,8 @@ Study.propTypes = {
   onWikiSubmit: PropTypes.func.isRequired,
   Wiki: PropTypes.object,
   WikiMeta: PropTypes.object,
+  wikiOverride: PropTypes.bool,
+  onWikiOverride: PropTypes.func,
 };
 
 Study.defaultProps = {
@@ -241,6 +246,7 @@ const mapStateToProps = createStructuredSelector({
   Wiki: makeSelectWiki(),
   WikiMeta: makeSelectWikiMeta(),
   Auth: makeSelectAuthState(),
+  wikiOverride: makeSelectWikiOverride(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -251,6 +257,7 @@ function mapDispatchToProps(dispatch) {
     onAnonymousClick: () => dispatch({ type: SHOULD_OPEN_LOGIN_MODAL }),
     onTagSubmit: (nctId, tag) => dispatch(actions.submitTagAction(nctId, tag)),
     onTagRemove: (nctId, tag) => dispatch(actions.removeTagAction(nctId, tag)),
+    onWikiOverride: (nctId, shouldOverride) => dispatch(actions.onWikiOverrideAction(nctId, shouldOverride)),
     onReviewSubmit: actions.submitReviewAction(dispatch),
     onReviewUpdate: actions.updateReviewAction(dispatch),
     onReviewDelete: actions.deleteReviewAction(dispatch),

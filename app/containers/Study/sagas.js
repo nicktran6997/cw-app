@@ -1,4 +1,4 @@
-import { put, takeEvery, call, take, cancel } from 'redux-saga/effects';
+import { put, takeEvery, call, take, cancel, select } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
   REQUEST_STUDY_ACTION,
@@ -9,7 +9,9 @@ import {
   ANNOTATION_UPDATE_ACTION,
   TAG_REMOVE_ACTION,
   TAG_SUBMIT_ACTION,
+  SET_WIKI_OVERRIDE_ACTION,
 } from './constants';
+import { makeSelectWikiOverride } from './selectors';
 import {
   defaultAction,
   trackingAction,
@@ -22,7 +24,8 @@ import {
 import client from '../../utils/client';
 
 export function* loadDefault(action) {
-  const data = yield client.get(`/studies/${action.nctId}/json`);
+  const override = yield select(makeSelectWikiOverride());
+  const data = yield client.get(`/studies/${action.nctId}/json?wiki_override=${override}`);
   yield put(defaultAction(data.data));
 }
 
@@ -152,9 +155,16 @@ export function* tagsSaga() {
   yield cancel(submitTagWatcher);
 }
 
+export function* wikiOverrideSaga() {
+  const overrideWatcher = yield takeEvery(SET_WIKI_OVERRIDE_ACTION, reloadStudy);
+  yield take(LOCATION_CHANGE);
+  yield cancel(overrideWatcher);
+}
+
 export default [
   reloadStudySaga,
   wikiSaga,
   annotationsSaga,
   tagsSaga,
+  wikiOverrideSaga,
 ];

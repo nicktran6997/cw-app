@@ -99,7 +99,7 @@ class TagManager extends React.Component {
 /* eslint-disable react/no-unused-prop-types */
 TagManager.propTypes = {
   nct_id: React.PropTypes.string,
-  tags: React.PropTypes.arrayOf(React.PropTypes.object),
+  tags: React.PropTypes.arrayOf(React.PropTypes.string),
   onTagRemove: React.PropTypes.func,
   onTagSubmit: React.PropTypes.func,
   onAnonymousClick: React.PropTypes.func,
