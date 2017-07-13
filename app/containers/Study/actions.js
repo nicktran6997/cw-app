@@ -48,6 +48,26 @@ export const wikiSubmitAction = (nctId, wikiText) => ({
   wikiText,
 });
 
+export const createAnnotationAction = (nctId, key, value) => ({
+  type: ANNOTATION_CREATE_ACTION,
+  nctId,
+  key,
+  value,
+});
+
+export const updateAnnotationAction = (nctId, key, value) => ({
+  type: ANNOTATION_UPDATE_ACTION,
+  nctId,
+  key,
+  value,
+});
+
+export const deleteAnnotationAction = (nctId, key) => ({
+  type: ANNOTATION_DELETE_ACTION,
+  nctId,
+  key,
+});
+
 export const defaultAction = (data) => ({
   type: DEFAULT_ACTION,
   data,
@@ -94,31 +114,6 @@ export const submitTagAction = (dispatch) =>
       type: TAG_SUBMIT_ACTION,
       data: data.data,
     }));
-
-export const updateAnnotationAction = (dispatch) =>
-  (annotationId, description) =>
-    client.patch(`/annotations/${annotationId}.json`, { description })
-    .then(() =>
-      dispatch({
-        type: ANNOTATION_UPDATE_ACTION,
-      }));
-
-export const deleteAnnotationAction = (dispatch) =>
-  (annotationId) =>
-    client.delete(`/annotations/${annotationId}.json`)
-    .then(() =>
-      dispatch({
-        type: ANNOTATION_DELETE_ACTION,
-      }));
-
-export const createAnnotationAction = (dispatch) =>
-  (nctId, label, description) =>
-    client.post('/annotations.json', { nct_id: nctId, label, description })
-    .then(() =>
-      dispatch({
-        type: ANNOTATION_CREATE_ACTION,
-      }));
-
 
 export const submitReviewAction = (dispatch) =>
   (nctId, comment, rating) =>

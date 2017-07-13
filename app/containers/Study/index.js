@@ -26,9 +26,6 @@ export class Study extends React.Component {
     this.onWikiSubmit = this.onWikiSubmit.bind(this);
     this.onTagSubmit = this.onTagSubmit.bind(this);
     this.onTagRemove = this.onTagRemove.bind(this);
-    this.onAnnotationCreate = this.onAnnotationCreate.bind(this);
-    this.onAnnotationRemove = this.onAnnotationRemove.bind(this);
-    this.onAnnotationUpdate = this.onAnnotationUpdate.bind(this);
     this.onReviewSubmit = this.onReviewSubmit.bind(this);
     this.onReviewDelete = this.onReviewDelete.bind(this);
     this.reload = this.reload.bind(this);
@@ -67,21 +64,6 @@ export class Study extends React.Component {
       .then(this.reload);
   }
 
-  onAnnotationCreate(label, description) {
-    return this.props.onAnnotationCreate(this.props.params.nctId, label, description)
-      .then(this.reload);
-  }
-
-  onAnnotationRemove(annotationId) {
-    return this.props.onAnnotationRemove(annotationId)
-      .then(this.reload);
-  }
-
-  onAnnotationUpdate(annotationId, description) {
-    this.props.onAnnotationUpdate(annotationId, description)
-      .then(this.reload);
-  }
-
   onReviewSubmit(comment, rating, reviewId) {
     if (reviewId) {
       this.props.onReviewUpdate(reviewId, comment, rating)
@@ -105,12 +87,13 @@ export class Study extends React.Component {
       case 'crowd':
         return (
           <CrowdTab
+            nctId={this.props.params.nctId}
             data={this.props.WikiMeta}
             loggedIn={this.props.Auth.loggedIn}
             onAnonymousClick={this.props.onAnonymousClick}
-            onAnnotationRemove={this.onAnnotationRemove}
-            onAnnotationUpdate={this.onAnnotationUpdate}
-            onAnnotationCreate={this.onAnnotationCreate}
+            onAnnotationRemove={this.props.onAnnotationRemove}
+            onAnnotationUpdate={this.props.onAnnotationUpdate}
+            onAnnotationCreate={this.props.onAnnotationCreate}
           />);
       case 'wiki':
         return (
@@ -289,9 +272,9 @@ function mapDispatchToProps(dispatch) {
     onReviewUpdate: actions.updateReviewAction(dispatch),
     onReviewDelete: actions.deleteReviewAction(dispatch),
     getReview: actions.getReviewAction(dispatch),
-    onAnnotationRemove: actions.deleteAnnotationAction(dispatch),
-    onAnnotationUpdate: actions.updateAnnotationAction(dispatch),
-    onAnnotationCreate: actions.createAnnotationAction(dispatch),
+    onAnnotationRemove: (nctId, key) => dispatch(actions.deleteAnnotationAction(nctId, key)),
+    onAnnotationUpdate: (nctId, key, value) => dispatch(actions.updateAnnotationAction(nctId, key, value)),
+    onAnnotationCreate: (nctId, key, value) => dispatch(actions.createAnnotationAction(nctId, key, value)),
   };
 }
 

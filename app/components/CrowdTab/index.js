@@ -17,32 +17,30 @@ class CrowdTab extends React.Component {
     this.removedRows = {};
   }
 
-  onAnnotationUpdateSubmit(id) {
+  onAnnotationUpdateSubmit(key) {
     if (this.props.loggedIn) {
-      const p = Promise.resolve();
-      if (this.rowIsUpdating(id)) {
-        p.then(() => this.props.onAnnotationUpdate(id, this.updateRowData[id].description));
+      if (this.rowIsUpdating(key)) {
+        this.props.onAnnotationUpdate(this.props.nctId, key, this.updateRowData[key].description);
       }
-      p.then(() => { this.updateableRows[id] = !this.updateableRows[id]; });
-      p.then(() => this.forceUpdate());
+      this.updateableRows[key] = !this.updateableRows[key];
+      this.forceUpdate();
     } else {
       this.props.onAnonymousClick();
     }
   }
 
-  onAnnotationDelete(id) {
+  onAnnotationDelete(key) {
     if (this.props.loggedIn) {
-      this.removedRows[id] = true;
-      this.props.onAnnotationRemove(id)
-        .then(() => this.forceUpdate());
+      this.removedRows[key] = true;
+      this.props.onAnnotationRemove(this.props.nctId, key);
     } else {
       this.props.onAnonymousClick();
     }
   }
 
-  onDescriptionChange(e, id) {
-    this.updateRowData[id] = this.updateRowData[id] || {};
-    this.updateRowData[id].description = e.target.value;
+  onDescriptionChange(e, key) {
+    this.updateRowData[key] = this.updateRowData[key] || {};
+    this.updateRowData[key].description = e.target.value;
   }
 
   addAnnotation() {
@@ -55,21 +53,18 @@ class CrowdTab extends React.Component {
   }
 
   createAnnotation() {
-    this.props.onAnnotationCreate(this.newLabel, this.newDescription)
-      .then(() => {
-        this.newLabel = '';
-        this.newDescription = '';
-        this.isAddingAnnotation = false;
-      })
-      .then(() => this.forceUpdate());
+    this.props.onAnnotationCreate(this.props.nctId, this.newLabel, this.newDescription);
+    this.newLabel = '';
+    this.newDescription = '';
+    this.isAddingAnnotation = false;
   }
 
-  rowIsUpdating(id) {
-    return this.updateableRows[id];
+  rowIsUpdating(key) {
+    return this.updateableRows[key];
   }
 
-  rowIsRemoved(id) {
-    return this.removedRows && this.removedRows[id];
+  rowIsRemoved(key) {
+    return this.removedRows && this.removedRows[key];
   }
 
   render() {
@@ -158,6 +153,7 @@ class CrowdTab extends React.Component {
 }
 
 CrowdTab.propTypes = {
+  nctId: PropTypes.string,
   data: PropTypes.object,
   loggedIn: PropTypes.bool,
   onAnonymousClick: PropTypes.func.isRequired,
