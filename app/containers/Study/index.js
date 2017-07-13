@@ -13,7 +13,7 @@ import WikiTab from '../../components/WikiTab';
 import LoginModal from '../../containers/LoginSignup/LoginModal';
 import { SHOULD_OPEN_LOGIN_MODAL } from '../../containers/LoginSignup/constants';
 import { makeSelectAuthState } from '../App/selectors';
-import makeSelectStudy from './selectors';
+import makeSelectStudy, { makeSelectWiki, makeSelectWikiMeta, makeSelectWikiOverride } from './selectors';
 import * as actions from './actions';
 
 const defaultTabs = [
@@ -23,12 +23,6 @@ const defaultTabs = [
 export class Study extends React.Component {
   constructor(props) {
     super(props);
-    this.onWikiSubmit = this.onWikiSubmit.bind(this);
-    this.onTagSubmit = this.onTagSubmit.bind(this);
-    this.onTagRemove = this.onTagRemove.bind(this);
-    this.onAnnotationCreate = this.onAnnotationCreate.bind(this);
-    this.onAnnotationRemove = this.onAnnotationRemove.bind(this);
-    this.onAnnotationUpdate = this.onAnnotationUpdate.bind(this);
     this.onReviewSubmit = this.onReviewSubmit.bind(this);
     this.onReviewDelete = this.onReviewDelete.bind(this);
     this.reload = this.reload.bind(this);
@@ -49,37 +43,8 @@ export class Study extends React.Component {
     }
   }
 
-  onTagSubmit(e, newTag) {
-    e.preventDefault();
-    if (newTag) {
-      this.props.onTagSubmit(this.props.params.nctId, newTag)
-        .then(this.reload);
-    }
-  }
-
   onWikiSubmit(newWikiText) {
     this.props.onWikiSubmit(this.props.params.nctId, newWikiText);
-  }
-
-  onTagRemove(e, tagId) {
-    e.preventDefault();
-    this.props.onTagRemove(this.props.params.nctId, tagId)
-      .then(this.reload);
-  }
-
-  onAnnotationCreate(label, description) {
-    return this.props.onAnnotationCreate(this.props.params.nctId, label, description)
-      .then(this.reload);
-  }
-
-  onAnnotationRemove(annotationId) {
-    return this.props.onAnnotationRemove(annotationId)
-      .then(this.reload);
-  }
-
-  onAnnotationUpdate(annotationId, description) {
-    this.props.onAnnotationUpdate(annotationId, description)
-      .then(this.reload);
   }
 
   onReviewSubmit(comment, rating, reviewId) {
@@ -105,20 +70,22 @@ export class Study extends React.Component {
       case 'crowd':
         return (
           <CrowdTab
-            data={this.props.Study.crowd}
+            nctId={this.props.params.nctId}
+            data={this.props.WikiMeta}
             loggedIn={this.props.Auth.loggedIn}
             onAnonymousClick={this.props.onAnonymousClick}
-            onAnnotationRemove={this.onAnnotationRemove}
-            onAnnotationUpdate={this.onAnnotationUpdate}
-            onAnnotationCreate={this.onAnnotationCreate}
+            onAnnotationRemove={this.props.onAnnotationRemove}
+            onAnnotationUpdate={this.props.onAnnotationUpdate}
+            onAnnotationCreate={this.props.onAnnotationCreate}
           />);
       case 'wiki':
         return (
           <WikiTab
-            wiki={this.props.Study.wiki}
+            wiki={this.props.Wiki}
+            nctId={this.props.params.nctId}
             loggedIn={this.props.Auth.loggedIn}
             onAnonymousClick={this.props.onAnonymousClick}
-            onWikiSubmit={this.onWikiSubmit}
+            onWikiSubmit={this.props.onWikiSubmit}
           />);
       default:
         return (<StudyTab data={this.props.Study[tab]} />);
@@ -221,9 +188,11 @@ export class Study extends React.Component {
             {...this.props.Study.study}
             router={this.props.router}
             loggedIn={this.props.Auth.loggedIn}
-            onTagSubmit={this.onTagSubmit}
-            onTagRemove={this.onTagRemove}
+            onTagSubmit={this.props.onTagSubmit}
+            onTagRemove={this.props.onTagRemove}
             onAnonymousClick={this.props.onAnonymousClick}
+            wikiOverride={this.props.wikiOverride}
+            onWikiOverride={this.props.onWikiOverride}
           />
           <Col md={9} id="study-main">
             <Row>
@@ -262,6 +231,10 @@ Study.propTypes = {
   onAnnotationCreate: PropTypes.func.isRequired,
   onAnonymousClick: PropTypes.func.isRequired,
   onWikiSubmit: PropTypes.func.isRequired,
+  Wiki: PropTypes.object,
+  WikiMeta: PropTypes.object,
+  wikiOverride: PropTypes.bool,
+  onWikiOverride: PropTypes.func,
 };
 
 Study.defaultProps = {
@@ -270,7 +243,10 @@ Study.defaultProps = {
 
 const mapStateToProps = createStructuredSelector({
   Study: makeSelectStudy(),
+  Wiki: makeSelectWiki(),
+  WikiMeta: makeSelectWikiMeta(),
   Auth: makeSelectAuthState(),
+  wikiOverride: makeSelectWikiOverride(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -279,15 +255,16 @@ function mapDispatchToProps(dispatch) {
     getStudy: (nctId) => dispatch(actions.getStudyAction(nctId)),
     onWikiSubmit: (nctId, wikiText) => dispatch(actions.wikiSubmitAction(nctId, wikiText)),
     onAnonymousClick: () => dispatch({ type: SHOULD_OPEN_LOGIN_MODAL }),
-    onTagSubmit: actions.submitTagAction(dispatch),
-    onTagRemove: actions.removeTagAction(dispatch),
+    onTagSubmit: (nctId, tag) => dispatch(actions.submitTagAction(nctId, tag)),
+    onTagRemove: (nctId, tag) => dispatch(actions.removeTagAction(nctId, tag)),
+    onWikiOverride: (nctId, shouldOverride) => dispatch(actions.onWikiOverrideAction(nctId, shouldOverride)),
     onReviewSubmit: actions.submitReviewAction(dispatch),
     onReviewUpdate: actions.updateReviewAction(dispatch),
     onReviewDelete: actions.deleteReviewAction(dispatch),
     getReview: actions.getReviewAction(dispatch),
-    onAnnotationRemove: actions.deleteAnnotationAction(dispatch),
-    onAnnotationUpdate: actions.updateAnnotationAction(dispatch),
-    onAnnotationCreate: actions.createAnnotationAction(dispatch),
+    onAnnotationRemove: (nctId, key) => dispatch(actions.deleteAnnotationAction(nctId, key)),
+    onAnnotationUpdate: (nctId, key, value) => dispatch(actions.updateAnnotationAction(nctId, key, value)),
+    onAnnotationCreate: (nctId, key, value) => dispatch(actions.createAnnotationAction(nctId, key, value)),
   };
 }
 

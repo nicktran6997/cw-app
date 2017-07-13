@@ -1,9 +1,3 @@
-/**
-*
-* TagManager
-*
-*/
-
 import React from 'react';
 import {
   Row, Col, Button, FormControl, Table, FormGroup, Form,
@@ -19,10 +13,11 @@ class TagManager extends React.Component {
     this.newTag = '';
   }
 
-  onTagRemove(e, tagId) {
+  onTagRemove(e, tag) {
+    e.persist();
+    e.preventDefault();
     if (this.props.loggedIn) {
-      e.persist();
-      this.props.onTagRemove(e, tagId);
+      this.props.onTagRemove(this.props.nct_id, tag);
     } else {
       this.props.onAnonymousClick();
     }
@@ -30,11 +25,11 @@ class TagManager extends React.Component {
 
   onTagSubmit(e) {
     e.persist();
+    e.preventDefault();
     if (this.props.loggedIn) {
-      this.props.onTagSubmit(e, this.newTag);
+      this.props.onTagSubmit(this.props.nct_id, this.newTag);
       this.textInput.value = '';
     } else {
-      e.preventDefault();
       this.props.onAnonymousClick();
     }
   }
@@ -44,18 +39,18 @@ class TagManager extends React.Component {
   }
 
   render() {
-    let existingTags = '';
+    let existingTags = null;
     if (this.props.tags) {
       existingTags = this.props.tags.map((tag) => (
-        <tr key={tag.id}>
+        <tr key={tag}>
           <td>
-            {tag.value}
+            {tag}
           </td>
           <td>
             <FontAwesome
               name="remove"
               style={{ cursor: 'pointer' }}
-              onClick={(e) => this.onTagRemove(e, tag.id)}
+              onClick={(e) => this.onTagRemove(e, tag)}
             />
           </td>
         </tr>
@@ -103,7 +98,8 @@ class TagManager extends React.Component {
 // idk why loggedIn isn't working
 /* eslint-disable react/no-unused-prop-types */
 TagManager.propTypes = {
-  tags: React.PropTypes.arrayOf(React.PropTypes.object),
+  nct_id: React.PropTypes.string,
+  tags: React.PropTypes.arrayOf(React.PropTypes.string),
   onTagRemove: React.PropTypes.func,
   onTagSubmit: React.PropTypes.func,
   onAnonymousClick: React.PropTypes.func,

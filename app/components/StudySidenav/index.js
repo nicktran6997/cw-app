@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Col, Row, Button, ButtonGroup } from 'react-bootstrap';
+import { Col, Row, Button, ButtonGroup, Checkbox } from 'react-bootstrap';
 import ReactStars from 'react-stars';
 import FontAwesome from 'react-fontawesome';
 import TagManager from '../../components/TagManager';
@@ -12,13 +12,19 @@ const StudySidenav = (props) => (
       </Col>
     </Row>
     <Row>
-      <Col md={12}>
+      <Col md={5}>
         <ReactStars
           count={5}
           edit={false}
           value={props.average_rating}
         />
         <small><i>{props.reviews_length || 0} Reviews</i></small>
+      </Col>
+      <Col md={5} style={{ paddingTop: '8px', textAlign: 'right' }}>
+        <small><i>Display Wiki Data</i></small>
+      </Col>
+      <Col md={2} style={{ paddingLeft: 0 }}>
+        <Checkbox checked={props.wikiOverride} onChange={() => props.onWikiOverride(props.nct_id, !props.wikiOverride)} />
       </Col>
     </Row>
     <Row style={{ marginBottom: '10px', marginTop: '10px' }}>
@@ -95,6 +101,8 @@ StudySidenav.propTypes = {
   loggedIn: PropTypes.bool,
   onAnonymousClick: PropTypes.func,
   router: PropTypes.object,
+  wikiOverride: PropTypes.bool,
+  onWikiOverride: PropTypes.func,
 };
 
 export default StudySidenav;

@@ -71,9 +71,9 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
       return this.props.onAnonymousClick();
     }
     if (this.state.markdown) {
-      this.props.onWikiSubmit(this.state.markdownValue);
+      this.props.onWikiSubmit(this.props.nctId, this.state.markdownValue);
     } else {
-      this.props.onWikiSubmit(this.state.value.toString('markdown'));
+      this.props.onWikiSubmit(this.props.nctId, this.state.value.toString('markdown'));
     }
     return this.toggleEditable();
   }
@@ -192,28 +192,30 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
           <tbody>
             { this.props.wiki.history.map((h) => (
               <tr key={h.id} style={{ padding: '10px' }}>
-                <Row style={{ marginBottom: '10px', padding: '10px' }}>
-                  <Col md={6}>
-                    <b>{this.getName(h.user)}</b>
-                    <br />
-                  </Col>
-                  <Col md={4}>
-                    {h.comment}
-                  </Col>
-                  <Col md={2} className="text-right">
-                    <small>
-                      {new Date(h.created_at).toLocaleDateString('en-US')}
-                    </small>
-                  </Col>
-                </Row>
-                <Row style={{ padding: '10px', marginBottom: '10px' }}>
-                  <Col md={12}>
-                    <div
-                      /* eslint-disable react/no-danger */
-                      dangerouslySetInnerHTML={{ __html: h.diff_html }}
-                    />
-                  </Col>
-                </Row>
+                <td>
+                  <Row style={{ marginBottom: '10px', padding: '10px' }}>
+                    <Col md={6}>
+                      <b>{this.getName(h.user)}</b>
+                      <br />
+                    </Col>
+                    <Col md={4}>
+                      {h.comment}
+                    </Col>
+                    <Col md={2} className="text-right">
+                      <small>
+                        {new Date(h.created_at).toLocaleDateString('en-US')}
+                      </small>
+                    </Col>
+                  </Row>
+                  <Row style={{ padding: '10px', marginBottom: '10px' }}>
+                    <Col md={12}>
+                      <div
+                        /* eslint-disable react/no-danger */
+                        dangerouslySetInnerHTML={{ __html: h.diff_html }}
+                      />
+                    </Col>
+                  </Row>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -305,6 +307,7 @@ WikiTab.propTypes = {
   onWikiSubmit: PropTypes.func,
   onAnonymousClick: PropTypes.func,
   loggedIn: PropTypes.bool,
+  nctId: PropTypes.string,
 };
 
 WikiTab.defaultProps = {

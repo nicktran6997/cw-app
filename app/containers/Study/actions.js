@@ -25,7 +25,14 @@ import {
   RELOAD_STUDY_ACTION,
   WIKI_ACTION,
   WIKI_SUBMIT_ACTION,
+  SET_WIKI_OVERRIDE_ACTION,
 } from './constants';
+
+export const onWikiOverrideAction = (nctId, shouldOverride) => ({
+  type: SET_WIKI_OVERRIDE_ACTION,
+  nctId,
+  shouldOverride,
+});
 
 export const getStudyAction = (nctId) => ({
   type: REQUEST_STUDY_ACTION,
@@ -46,6 +53,26 @@ export const wikiSubmitAction = (nctId, wikiText) => ({
   type: WIKI_SUBMIT_ACTION,
   nctId,
   wikiText,
+});
+
+export const createAnnotationAction = (nctId, key, value) => ({
+  type: ANNOTATION_CREATE_ACTION,
+  nctId,
+  key,
+  value,
+});
+
+export const updateAnnotationAction = (nctId, key, value) => ({
+  type: ANNOTATION_UPDATE_ACTION,
+  nctId,
+  key,
+  value,
+});
+
+export const deleteAnnotationAction = (nctId, key) => ({
+  type: ANNOTATION_DELETE_ACTION,
+  nctId,
+  key,
 });
 
 export const defaultAction = (data) => ({
@@ -78,47 +105,17 @@ export const recruitmentAction = (data) => ({
   data,
 });
 
-export const removeTagAction = (dispatch) =>
-  (nctId, tagId) =>
-    client.delete(`/tags/${tagId}`, { nct_id: nctId })
-    .then(() => dispatch({
-      type: TAG_REMOVE_ACTION,
-    }));
+export const removeTagAction = (nctId, tag) => ({
+  type: TAG_REMOVE_ACTION,
+  nctId,
+  tag,
+});
 
-export const submitTagAction = (dispatch) =>
-  (nctId, newTag) =>
-    client.post('/tags', {
-      nct_id: nctId,
-      new_tag: newTag,
-    }).then((data) => dispatch({
-      type: TAG_SUBMIT_ACTION,
-      data: data.data,
-    }));
-
-export const updateAnnotationAction = (dispatch) =>
-  (annotationId, description) =>
-    client.patch(`/annotations/${annotationId}.json`, { description })
-    .then(() =>
-      dispatch({
-        type: ANNOTATION_UPDATE_ACTION,
-      }));
-
-export const deleteAnnotationAction = (dispatch) =>
-  (annotationId) =>
-    client.delete(`/annotations/${annotationId}.json`)
-    .then(() =>
-      dispatch({
-        type: ANNOTATION_DELETE_ACTION,
-      }));
-
-export const createAnnotationAction = (dispatch) =>
-  (nctId, label, description) =>
-    client.post('/annotations.json', { nct_id: nctId, label, description })
-    .then(() =>
-      dispatch({
-        type: ANNOTATION_CREATE_ACTION,
-      }));
-
+export const submitTagAction = (nctId, tag) => ({
+  type: TAG_SUBMIT_ACTION,
+  nctId,
+  tag,
+});
 
 export const submitReviewAction = (dispatch) =>
   (nctId, comment, rating) =>
