@@ -98,22 +98,17 @@ export const recruitmentAction = (data) => ({
   data,
 });
 
-export const removeTagAction = (dispatch) =>
-  (nctId, tagId) =>
-    client.delete(`/tags/${tagId}`, { nct_id: nctId })
-    .then(() => dispatch({
-      type: TAG_REMOVE_ACTION,
-    }));
+export const removeTagAction = (nctId, tag) => ({
+  type: TAG_REMOVE_ACTION,
+  nctId,
+  tag,
+});
 
-export const submitTagAction = (dispatch) =>
-  (nctId, newTag) =>
-    client.post('/tags', {
-      nct_id: nctId,
-      new_tag: newTag,
-    }).then((data) => dispatch({
-      type: TAG_SUBMIT_ACTION,
-      data: data.data,
-    }));
+export const submitTagAction = (nctId, tag) => ({
+  type: TAG_SUBMIT_ACTION,
+  nctId,
+  tag,
+});
 
 export const submitReviewAction = (dispatch) =>
   (nctId, comment, rating) =>

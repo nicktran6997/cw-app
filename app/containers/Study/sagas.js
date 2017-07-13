@@ -7,6 +7,8 @@ import {
   ANNOTATION_CREATE_ACTION,
   ANNOTATION_DELETE_ACTION,
   ANNOTATION_UPDATE_ACTION,
+  TAG_REMOVE_ACTION,
+  TAG_SUBMIT_ACTION,
 } from './constants';
 import {
   defaultAction,
@@ -96,24 +98,63 @@ export function* deleteAnnotation(action) {
   yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
 }
 
-export function* studySaga() {
+export function* submitTag(action) {
+  yield client.post(
+    wikiUrl(action),
+    { add_tag: action.tag }
+  );
+  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+}
+
+export function* removeTag(action) {
+  yield client.post(
+    wikiUrl(action),
+    { remove_tag: action.tag }
+  );
+  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+}
+
+export function* reloadStudySaga() {
   const requestWatcher = yield takeEvery(REQUEST_STUDY_ACTION, loadStudy);
   const reloadWatcher = yield takeEvery(RELOAD_STUDY_ACTION, reloadStudy);
+
+  yield take(LOCATION_CHANGE);
+
+  yield cancel(requestWatcher);
+  yield cancel(reloadWatcher);
+}
+
+export function* wikiSaga() {
   const submitWatcher = yield takeEvery(WIKI_SUBMIT_ACTION, submitWiki);
+  yield take(LOCATION_CHANGE);
+  yield cancel(submitWatcher);
+}
+
+export function* annotationsSaga() {
   const createAnnotationWatcher = yield takeEvery(ANNOTATION_CREATE_ACTION, postAnnotation);
   const deleteAnnotationWatcher = yield takeEvery(ANNOTATION_DELETE_ACTION, deleteAnnotation);
   const updateAnnotationWatcher = yield takeEvery(ANNOTATION_UPDATE_ACTION, postAnnotation);
 
   yield take(LOCATION_CHANGE);
 
-  yield cancel(requestWatcher);
-  yield cancel(reloadWatcher);
-  yield cancel(submitWatcher);
   yield cancel(createAnnotationWatcher);
   yield cancel(deleteAnnotationWatcher);
   yield cancel(updateAnnotationWatcher);
 }
 
+export function* tagsSaga() {
+  const removeTagWatcher = yield takeEvery(TAG_REMOVE_ACTION, removeTag);
+  const submitTagWatcher = yield takeEvery(TAG_SUBMIT_ACTION, submitTag);
+
+  yield take(LOCATION_CHANGE);
+
+  yield cancel(removeTagWatcher);
+  yield cancel(submitTagWatcher);
+}
+
 export default [
-  studySaga,
+  reloadStudySaga,
+  wikiSaga,
+  annotationsSaga,
+  tagsSaga,
 ];

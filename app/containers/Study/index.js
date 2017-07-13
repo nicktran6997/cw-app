@@ -23,9 +23,6 @@ const defaultTabs = [
 export class Study extends React.Component {
   constructor(props) {
     super(props);
-    this.onWikiSubmit = this.onWikiSubmit.bind(this);
-    this.onTagSubmit = this.onTagSubmit.bind(this);
-    this.onTagRemove = this.onTagRemove.bind(this);
     this.onReviewSubmit = this.onReviewSubmit.bind(this);
     this.onReviewDelete = this.onReviewDelete.bind(this);
     this.reload = this.reload.bind(this);
@@ -46,22 +43,8 @@ export class Study extends React.Component {
     }
   }
 
-  onTagSubmit(e, newTag) {
-    e.preventDefault();
-    if (newTag) {
-      this.props.onTagSubmit(this.props.params.nctId, newTag)
-        .then(this.reload);
-    }
-  }
-
   onWikiSubmit(newWikiText) {
     this.props.onWikiSubmit(this.props.params.nctId, newWikiText);
-  }
-
-  onTagRemove(e, tagId) {
-    e.preventDefault();
-    this.props.onTagRemove(this.props.params.nctId, tagId)
-      .then(this.reload);
   }
 
   onReviewSubmit(comment, rating, reviewId) {
@@ -101,7 +84,7 @@ export class Study extends React.Component {
             wiki={this.props.Wiki}
             loggedIn={this.props.Auth.loggedIn}
             onAnonymousClick={this.props.onAnonymousClick}
-            onWikiSubmit={this.onWikiSubmit}
+            onWikiSubmit={this.props.onWikiSubmit}
           />);
       default:
         return (<StudyTab data={this.props.Study[tab]} />);
@@ -204,8 +187,8 @@ export class Study extends React.Component {
             {...this.props.Study.study}
             router={this.props.router}
             loggedIn={this.props.Auth.loggedIn}
-            onTagSubmit={this.onTagSubmit}
-            onTagRemove={this.onTagRemove}
+            onTagSubmit={this.props.onTagSubmit}
+            onTagRemove={this.props.onTagRemove}
             onAnonymousClick={this.props.onAnonymousClick}
           />
           <Col md={9} id="study-main">
@@ -266,8 +249,8 @@ function mapDispatchToProps(dispatch) {
     getStudy: (nctId) => dispatch(actions.getStudyAction(nctId)),
     onWikiSubmit: (nctId, wikiText) => dispatch(actions.wikiSubmitAction(nctId, wikiText)),
     onAnonymousClick: () => dispatch({ type: SHOULD_OPEN_LOGIN_MODAL }),
-    onTagSubmit: actions.submitTagAction(dispatch),
-    onTagRemove: actions.removeTagAction(dispatch),
+    onTagSubmit: (nctId, tag) => dispatch(actions.submitTagAction(nctId, tag)),
+    onTagRemove: (nctId, tag) => dispatch(actions.removeTagAction(nctId, tag)),
     onReviewSubmit: actions.submitReviewAction(dispatch),
     onReviewUpdate: actions.updateReviewAction(dispatch),
     onReviewDelete: actions.deleteReviewAction(dispatch),
