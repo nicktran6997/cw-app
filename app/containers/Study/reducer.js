@@ -19,7 +19,7 @@ import {
 } from './constants';
 
 const initialState = fromJS({
-  wikiOverride: false,
+  wikiOverride: true,
 });
 
 function studyReducer(state = initialState, action) {
