@@ -50,16 +50,13 @@ export class Study extends React.Component {
   onReviewSubmit(comment, rating, reviewId) {
     if (reviewId) {
       this.props.onReviewUpdate(this.props.params.nctId, reviewId, comment, rating);
-      this.props.router.push(`/reviews/${this.props.params.nctId}`);
     } else {
       this.props.onReviewSubmit(this.props.params.nctId, comment, rating);
-      this.props.router.push(`/reviews/${this.props.params.nctId}`);
     }
   }
 
   onReviewDelete(nctId, reviewId) {
-    this.props.onReviewDelete(reviewId);
-    this.props.router.push(`/reviews/${nctId}`);
+    this.props.onReviewDelete(nctId, reviewId);
   }
 
   getTab(tab) {
@@ -115,7 +112,7 @@ export class Study extends React.Component {
       let stars;
       let reviewId = null;
       if (this.props.Study.review) {
-        review = this.props.Study.review.comment;
+        review = this.props.Study.review.text;
         if (this.props.Study.review.stars) {
           stars = this.props.Study.review.stars;
         } else if (this.props.Study.review.rating) {

@@ -21,6 +21,8 @@ class ReviewForm extends React.Component {
     this.onReviewChange = this.onReviewChange.bind(this);
     this.onReviewSubmit = this.onReviewSubmit.bind(this);
     this.addRating = this.addRating.bind(this);
+    this.removeRating = this.removeRating.bind(this);
+    this.removeAddedRating = this.removeAddedRating.bind(this);
     this.onStarFieldChange = this.onStarFieldChange.bind(this);
     this.stars = this.props.stars;
     this.review = this.props.review;
@@ -87,6 +89,19 @@ class ReviewForm extends React.Component {
     this.forceUpdate();
   }
 
+  removeRating(field) {
+    delete this.stars[field];
+    this.forceUpdate();
+  }
+
+  removeAddedRating(i) {
+    delete this.state.starFields[i];
+    delete this.state.addingStars[i];
+
+    this.state.addingRows -= 1;
+    this.forceUpdate();
+  }
+
   render() {
     if (!this.props.loggedIn) {
       return <h1>Not logged in!</h1>;
@@ -111,9 +126,14 @@ class ReviewForm extends React.Component {
                     onChange={(e) => this.onStarChange(field, e)}
                   />
                 </Col>
-                <Col md={2}>
+                <Col md={2} style={{ textAlign: 'right' }}>
+                  { field === 'Overall Rating' ? null :
+                  <Button bsSize="xsmall" onClick={() => this.removeRating(field)}>
+                    <FontAwesome name="minus" />
+                  </Button>
+                  }
                   { this.state.addingRows === 0 && (i === Object.keys(this.props.stars).length - 1) ?
-                    <Button onClick={this.addRating}>
+                    <Button bsSize="xsmall" style={{ marginLeft: '5px' }} onClick={this.addRating}>
                       <FontAwesome name="plus" />
                     </Button>
                     : null
@@ -138,11 +158,16 @@ class ReviewForm extends React.Component {
                     onChange={(e) => this.onAddingStarChange(i, e)}
                   />
                 </Col>
-                <Col md={2}>
+                <Col md={2} style={{ textAlign: 'right' }}>
                   { (i === this.state.addingRows - 1) ?
-                    <Button onClick={this.addRating}>
-                      <FontAwesome name="plus" />
-                    </Button>
+                    <div>
+                      <Button bsSize="xsmall" onClick={() => this.removeAddedRating(i)}>
+                        <FontAwesome name="minus" />
+                      </Button>
+                      <Button style={{ marginLeft: '5px' }} bsSize="xsmall" onClick={this.addRating}>
+                        <FontAwesome name="plus" />
+                      </Button>
+                    </div>
                     : null
                   }
                 </Col>
@@ -156,7 +181,7 @@ class ReviewForm extends React.Component {
                 />
               </Col>
             </Row>
-            <Row>
+            <Row style={{ marginTop: '10px' }}>
               <Col md={12} className="text-right">
                 <Button type="submit" onClick={this.onReviewSubmit}>
                   Submit

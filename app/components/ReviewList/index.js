@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactStars from 'react-stars';
-import { Table, Row, Col, Button, ButtonGroup } from 'react-bootstrap';
+import { Table, Row, Col, Button, ButtonGroup, Label } from 'react-bootstrap';
 
 class ReviewList extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -26,17 +26,10 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                     <b>{this.getName(review.user)}</b>
                     <br />
                   </Col>
-                  <Col md={2} className="text-right">
+                  <Col md={4} className="text-right">
                     <small>
                       {new Date(review.review.created_at).toLocaleDateString('en-US')}
                     </small>
-                  </Col>
-                  <Col md={2}>
-                    <ReactStars
-                      count={5}
-                      edit={false}
-                      value={review.review.overall_rating}
-                    />
                   </Col>
                 </Row>
                 <Row>
@@ -49,7 +42,7 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                       /* eslint-enable */
                     />
                   </Col>
-                  <Col md={3}>
+                  <Col md={3} style={{ textAlign: 'right' }}>
                     {this.props.Auth.loggedIn && review.user_id === this.props.Auth.id ?
                       <ButtonGroup>
                         <Button
@@ -68,6 +61,20 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                       </ButtonGroup>
                       : null }
                   </Col>
+                </Row>
+                <Row style={{ marginTop: '10px' }}>
+                  {Object.keys(review.review.stars).map((field) => (
+                    <div key={field}>
+                      <Col md={2}>
+                        <ReactStars
+                          count={5}
+                          edit={false}
+                          value={review.review.stars[field]}
+                        />
+                        <Label>{field}</Label>
+                      </Col>
+                    </div>
+                  ))}
                 </Row>
               </td>
             </tr>

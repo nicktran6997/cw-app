@@ -1,5 +1,6 @@
 import { put, takeEvery, call, take, cancel, select } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
+import { browserHistory } from 'react-router';
 import {
   REQUEST_STUDY_ACTION,
   RELOAD_STUDY_ACTION,
@@ -170,7 +171,8 @@ export function* wikiOverrideSaga() {
 
 export function* submitReview(action) {
   yield client.post(`/reviews/${action.nctId}`, action);
-  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+  yield call(reloadStudy, action);
+  browserHistory.push(`/reviews/${action.nctId}`);
 }
 
 export function* submitReviewSaga() {
@@ -181,7 +183,8 @@ export function* submitReviewSaga() {
 
 export function* updateReview(action) {
   yield client.patch(`/review/${action.reviewId}`, action);
-  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+  yield call(reloadStudy, action);
+  browserHistory.push(`/reviews/${action.nctId}`);
 }
 
 export function* updateReviewSaga() {
@@ -192,7 +195,8 @@ export function* updateReviewSaga() {
 
 export function* deleteReview(action) {
   yield client.delete(`/review/${action.reviewId}`);
-  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+  yield call(reloadStudy, action);
+  browserHistory.push(`/reviews/${action.nctId}`);
 }
 
 export function* deleteReviewSaga() {
@@ -202,7 +206,7 @@ export function* deleteReviewSaga() {
 }
 
 export function* getReview(action) {
-  const { data } = yield client.get(`/reviews/${action.reviewId}`);
+  const { data } = yield client.get(`/review/${action.reviewId}`);
   yield put(reviewReceiveAction(data));
 }
 
