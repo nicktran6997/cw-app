@@ -35,13 +35,19 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                     <ReactStars
                       count={5}
                       edit={false}
-                      value={review.review.rating}
+                      value={review.review.overall_rating}
                     />
                   </Col>
                 </Row>
                 <Row>
                   <Col md={9}>
-                    {review.review.comment}
+                    <div
+                      /* eslint-disable */
+                      dangerouslySetInnerHTML={{
+                        __html: review.review.text_html,
+                      }}
+                      /* eslint-enable */
+                    />
                   </Col>
                   <Col md={3}>
                     {this.props.Auth.loggedIn && review.user_id === this.props.Auth.id ?

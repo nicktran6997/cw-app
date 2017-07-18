@@ -10,6 +10,10 @@ import {
   TAG_REMOVE_ACTION,
   TAG_SUBMIT_ACTION,
   SET_WIKI_OVERRIDE_ACTION,
+  REVIEW_SUBMIT_ACTION,
+  REVIEW_UPDATE_ACTION,
+  REVIEW_DELETE_ACTION,
+  GET_REVIEW_ACTION,
 } from './constants';
 import { makeSelectWikiOverride } from './selectors';
 import {
@@ -20,6 +24,7 @@ import {
   recruitmentAction,
   reviewsAction,
   wikiAction,
+  reviewReceiveAction,
 } from './actions';
 import client from '../../utils/client';
 
@@ -50,7 +55,7 @@ export function* loadRecruitment(action) {
 }
 
 export function* loadReviews(action) {
-  const data = yield client.get(`reviews.json?nct_id=${action.nctId}`);
+  const data = yield client.get(`/reviews/${action.nctId}`);
   yield put(reviewsAction(data.data));
 }
 
@@ -145,26 +150,78 @@ export function* annotationsSaga() {
   yield cancel(updateAnnotationWatcher);
 }
 
-export function* tagsSaga() {
-  const removeTagWatcher = yield takeEvery(TAG_REMOVE_ACTION, removeTag);
-  const submitTagWatcher = yield takeEvery(TAG_SUBMIT_ACTION, submitTag);
-
+export function* tagsSubmitSaga() {
+  const watcher = yield takeEvery(TAG_SUBMIT_ACTION, submitTag);
   yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
 
-  yield cancel(removeTagWatcher);
-  yield cancel(submitTagWatcher);
+export function* tagRemoveSaga() {
+  const watcher = yield takeEvery(TAG_REMOVE_ACTION, removeTag);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
 }
 
 export function* wikiOverrideSaga() {
-  const overrideWatcher = yield takeEvery(SET_WIKI_OVERRIDE_ACTION, reloadStudy);
+  const watcher = yield takeEvery(SET_WIKI_OVERRIDE_ACTION, reloadStudy);
   yield take(LOCATION_CHANGE);
-  yield cancel(overrideWatcher);
+  yield cancel(watcher);
 }
+
+export function* submitReview(action) {
+  yield client.post(`/reviews/${action.nctId}`, action);
+  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+}
+
+export function* submitReviewSaga() {
+  const watcher = yield takeEvery(REVIEW_SUBMIT_ACTION, submitReview);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
+export function* updateReview(action) {
+  yield client.patch(`/review/${action.reviewId}`, action);
+  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+}
+
+export function* updateReviewSaga() {
+  const watcher = yield takeEvery(REVIEW_UPDATE_ACTION, updateReview);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
+export function* deleteReview(action) {
+  yield client.delete(`/review/${action.reviewId}`);
+  yield put({ type: RELOAD_STUDY_ACTION, nctId: action.nctId });
+}
+
+export function* deleteReviewSaga() {
+  const watcher = yield takeEvery(REVIEW_DELETE_ACTION, deleteReview);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
+export function* getReview(action) {
+  const { data } = yield client.get(`/reviews/${action.reviewId}`);
+  yield put(reviewReceiveAction(data));
+}
+
+export function* getReviewSaga() {
+  const watcher = yield takeEvery(GET_REVIEW_ACTION, getReview);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 
 export default [
   reloadStudySaga,
   wikiSaga,
   annotationsSaga,
-  tagsSaga,
+  tagsSubmitSaga,
+  tagRemoveSaga,
   wikiOverrideSaga,
+  submitReviewSaga,
+  deleteReviewSaga,
+  updateReviewSaga,
+  getReviewSaga,
 ];

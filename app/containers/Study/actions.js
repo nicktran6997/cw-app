@@ -3,7 +3,6 @@
  * Study actions
  *
  */
-import client from '../../utils/client';
 import {
   DEFAULT_ACTION,
   CROWD_ACTION,
@@ -15,8 +14,9 @@ import {
   TAG_SUBMIT_ACTION,
   REVIEW_SUBMIT_ACTION,
   REVIEW_UPDATE_ACTION,
-  REVIEWS_RECEIVE_ACTION,
   REVIEW_RECEIVE_ACTION,
+  REVIEWS_RECEIVE_ACTION,
+  GET_REVIEW_ACTION,
   REVIEW_DELETE_ACTION,
   ANNOTATION_CREATE_ACTION,
   ANNOTATION_DELETE_ACTION,
@@ -117,38 +117,38 @@ export const submitTagAction = (nctId, tag) => ({
   tag,
 });
 
-export const submitReviewAction = (dispatch) =>
-  (nctId, comment, rating) =>
-    client.post('/reviews.json', { nct_id: nctId, comment, rating })
-    .then(() =>
-      dispatch({
-        type: REVIEW_SUBMIT_ACTION,
-      }));
+export const submitReviewAction = (nctId, review, stars) => ({
+  type: REVIEW_SUBMIT_ACTION,
+  nctId,
+  review,
+  stars,
+});
 
-export const updateReviewAction = (dispatch) =>
-  (reviewId, comment, rating) =>
-    client.patch(`/reviews/${reviewId}.json`, { comment, rating })
-    .then(() =>
-      dispatch({
-        type: REVIEW_UPDATE_ACTION,
-      }));
+export const updateReviewAction = (nctId, reviewId, review, stars) => ({
+  type: REVIEW_UPDATE_ACTION,
+  nctId,
+  reviewId,
+  review,
+  stars,
+});
 
 export const reviewsAction = (data) => ({
   type: REVIEWS_RECEIVE_ACTION,
   data,
 });
 
-export const getReviewAction = (dispatch) =>
-  (reviewId) =>
-    client.get(`reviews/${reviewId}`)
-      .then((data) => dispatch({
-        type: REVIEW_RECEIVE_ACTION,
-        data: data.data,
-      }));
+export const reviewReceiveAction = (data) => ({
+  type: REVIEW_RECEIVE_ACTION,
+  data,
+});
 
-export const deleteReviewAction = (dispatch) =>
-  (reviewId) =>
-    client.delete(`reviews/${reviewId}.json`)
-      .then(() => dispatch({
-        type: REVIEW_DELETE_ACTION,
-      }));
+export const getReviewAction = (reviewId) => ({
+  type: GET_REVIEW_ACTION,
+  reviewId,
+});
+
+export const deleteReviewAction = (nctId, reviewId) => ({
+  type: REVIEW_DELETE_ACTION,
+  nctId,
+  reviewId,
+});

@@ -49,20 +49,17 @@ export class Study extends React.Component {
 
   onReviewSubmit(comment, rating, reviewId) {
     if (reviewId) {
-      this.props.onReviewUpdate(reviewId, comment, rating)
-        .then(() => this.props.reload(this.props.params.nctId))
-        .then(() => this.props.router.push(`/reviews/${this.props.params.nctId}`));
+      this.props.onReviewUpdate(this.props.params.nctId, reviewId, comment, rating);
+      this.props.router.push(`/reviews/${this.props.params.nctId}`);
     } else {
-      this.props.onReviewSubmit(this.props.params.nctId, comment, rating)
-        .then(this.reload)
-        .then(() => this.props.router.push(`/reviews/${this.props.params.nctId}`));
+      this.props.onReviewSubmit(this.props.params.nctId, comment, rating);
+      this.props.router.push(`/reviews/${this.props.params.nctId}`);
     }
   }
 
   onReviewDelete(nctId, reviewId) {
-    this.props.onReviewDelete(reviewId)
-      .then(() => this.props.reload(nctId))
-      .then(() => this.props.router.push(`/reviews/${nctId}`));
+    this.props.onReviewDelete(reviewId);
+    this.props.router.push(`/reviews/${nctId}`);
   }
 
   getTab(tab) {
@@ -114,12 +111,18 @@ export class Study extends React.Component {
 
   getMainView() {
     if (this.props.location.pathname.match(/\/review\//)) {
-      let review = '';
-      let stars = 0;
+      let review;
+      let stars;
       let reviewId = null;
       if (this.props.Study.review) {
         review = this.props.Study.review.comment;
-        stars = this.props.Study.review.rating;
+        if (this.props.Study.review.stars) {
+          stars = this.props.Study.review.stars;
+        } else if (this.props.Study.review.rating) {
+          stars = {
+            'Overall Rating': this.props.Study.review.rating,
+          };
+        }
         reviewId = this.props.Study.review.id;
       }
       return (
@@ -154,9 +157,7 @@ export class Study extends React.Component {
   }
 
   loadReview(reviewId) {
-    this.reviewIsLoading = true;
-    this.props.getReview(reviewId)
-      .then(() => { this.reviewIsLoading = false; this.forceUpdate(); });
+    this.props.getReview(reviewId);
   }
 
   reload() {
@@ -258,10 +259,10 @@ function mapDispatchToProps(dispatch) {
     onTagSubmit: (nctId, tag) => dispatch(actions.submitTagAction(nctId, tag)),
     onTagRemove: (nctId, tag) => dispatch(actions.removeTagAction(nctId, tag)),
     onWikiOverride: (nctId, shouldOverride) => dispatch(actions.onWikiOverrideAction(nctId, shouldOverride)),
-    onReviewSubmit: actions.submitReviewAction(dispatch),
-    onReviewUpdate: actions.updateReviewAction(dispatch),
-    onReviewDelete: actions.deleteReviewAction(dispatch),
-    getReview: actions.getReviewAction(dispatch),
+    onReviewSubmit: (nctId, review, stars) => dispatch(actions.submitReviewAction(nctId, review, stars)),
+    onReviewUpdate: (nctId, reviewId, review, stars) => dispatch(actions.updateReviewAction(nctId, reviewId, review, stars)),
+    onReviewDelete: (nctId, reviewId) => dispatch(actions.deleteReviewAction(nctId, reviewId)),
+    getReview: (reviewId) => dispatch(actions.getReviewAction(reviewId)),
     onAnnotationRemove: (nctId, key) => dispatch(actions.deleteAnnotationAction(nctId, key)),
     onAnnotationUpdate: (nctId, key, value) => dispatch(actions.updateAnnotationAction(nctId, key, value)),
     onAnnotationCreate: (nctId, key, value) => dispatch(actions.createAnnotationAction(nctId, key, value)),
