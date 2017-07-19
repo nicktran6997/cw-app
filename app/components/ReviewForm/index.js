@@ -9,6 +9,17 @@ import { Button, Row, Col, FormControl } from 'react-bootstrap';
 
 const CREATE_REVIEW = 'Write your review here!';
 
+const DEFAULT_STARS = { 'Overall Rating': 0, Safety: 0, Efficacy: 0 };
+
+const DEFAULT_STATE = {
+  starFields: {},
+  starFieldsEditable: {},
+  addingStars: {},
+  addingRows: 0,
+  changed: false,
+  value: null,
+};
+
 const ReviewFormWrapper = styled.div`
   .rating-row { margin-bottom: 10px; }
   .adding-stars { padding-top: 5px; }
@@ -24,18 +35,11 @@ class ReviewForm extends React.Component {
     this.removeRating = this.removeRating.bind(this);
     this.removeAddedRating = this.removeAddedRating.bind(this);
     this.onStarFieldChange = this.onStarFieldChange.bind(this);
-    this.stars = this.props.stars;
+    this.stars = Object.assign(DEFAULT_STARS, this.props.stars);
     this.review = this.props.review;
   }
 
-  state = {
-    starFields: {},
-    starFieldsEditable: {},
-    addingStars: {},
-    addingRows: 0,
-    changed: false,
-    value: null,
-  };
+  state = DEFAULT_STATE;
 
   componentWillMount() {
     this.setState({
@@ -49,7 +53,7 @@ class ReviewForm extends React.Component {
       this.forceUpdate();
     }
     if (this.props.stars !== nextProps.stars) {
-      this.stars = nextProps.stars;
+      this.stars = Object.assign(DEFAULT_STARS, nextProps.stars);
     }
   }
 
@@ -81,6 +85,9 @@ class ReviewForm extends React.Component {
     const stars = Object.keys(this.state.addingStars).reduce((starAcc, i) =>
       starAcc.set(this.state.starFields[i], this.state.addingStars[i]), fromJS(this.stars)).toJS();
     this.props.onReviewSubmit(this.state.value.toString('markdown'), stars, this.props.reviewId);
+    this.state = Object.assign(DEFAULT_STATE,
+      { value: RichTextEditor.createValueFromString(CREATE_REVIEW, 'markdown') });
+    this.stars = DEFAULT_STARS;
   }
 
   addRating() {
@@ -205,9 +212,7 @@ ReviewForm.propTypes = {
 };
 
 ReviewForm.defaultProps = {
-  stars: {
-    'Overall Rating': '0',
-  },
+  stars: DEFAULT_STARS,
   review: '',
 };
 

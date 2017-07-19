@@ -43,7 +43,7 @@ class ReviewList extends React.Component { // eslint-disable-line react/prefer-s
                     />
                   </Col>
                   <Col md={3} style={{ textAlign: 'right' }}>
-                    {this.props.Auth.loggedIn && review.user_id === this.props.Auth.id ?
+                    {this.props.Auth.loggedIn && review.user.id === this.props.Auth.user.id ?
                       <ButtonGroup>
                         <Button
                           id={`edit-review-${review.review.id}`}

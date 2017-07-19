@@ -5,6 +5,7 @@
  */
 
 import { fromJS } from 'immutable';
+import { LOCATION_CHANGE } from 'react-router-redux';
 import {
   DEFAULT_ACTION,
   CROWD_ACTION,
@@ -40,6 +41,8 @@ function studyReducer(state = initialState, action) {
       return state.set('reviews', action.data);
     case REVIEW_RECEIVE_ACTION:
       return state.set('review', action.data);
+    case LOCATION_CHANGE:
+      return state.set('review', {});
     case WIKI_ACTION:
       return state.set('wiki', fromJS(action.data));
     case SET_WIKI_OVERRIDE_ACTION:
