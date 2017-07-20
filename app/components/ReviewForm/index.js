@@ -9,7 +9,7 @@ import { Button, Row, Col, FormControl } from 'react-bootstrap';
 
 const CREATE_REVIEW = 'Write your review here!';
 
-const DEFAULT_STARS = { 'Overall Rating': 0, Safety: 0, Efficacy: 0 };
+export const DEFAULT_STARS = { 'Overall Rating': 0, Safety: 0, Efficacy: 0 };
 
 const DEFAULT_STATE = {
   starFields: {},
@@ -39,7 +39,7 @@ class ReviewForm extends React.Component {
     this.review = this.props.review;
   }
 
-  state = DEFAULT_STATE;
+  state = Object.assign({}, DEFAULT_STATE);
 
   componentWillMount() {
     this.setState({
@@ -55,6 +55,26 @@ class ReviewForm extends React.Component {
     if (this.props.stars !== nextProps.stars) {
       this.stars = Object.assign(DEFAULT_STARS, nextProps.stars);
     }
+  }
+
+  componentWillUnmount() {
+    this.stars = { 'Overall Rating': 0, Safety: 0, Efficacy: 0 };
+    this.state = {
+      starFields: {},
+      starFieldsEditable: {},
+      addingStars: {},
+      addingRows: 0,
+      changed: false,
+      value: null,
+    };
+    // this is a dumb workaround but it fixing this state bug would
+    // require a lot more work with sagas than the star bug in a new review would merit
+    Object.keys(DEFAULT_STARS).forEach((star) => {
+      delete DEFAULT_STARS[star];
+    });
+    DEFAULT_STARS['Overall Rating'] = 0;
+    DEFAULT_STARS.Safety = 0;
+    DEFAULT_STARS.Efficacy = 0;
   }
 
   onStarFieldChange(i, e) {
@@ -87,7 +107,18 @@ class ReviewForm extends React.Component {
     this.props.onReviewSubmit(this.state.value.toString('markdown'), stars, this.props.reviewId);
     this.state = Object.assign(DEFAULT_STATE,
       { value: RichTextEditor.createValueFromString(CREATE_REVIEW, 'markdown') });
+
+    // this is a dumb workaround but it fixing this state bug would
+    // require a lot more work with sagas than the star bug in a new review would merit
+    Object.keys(DEFAULT_STARS).forEach((star) => {
+      delete DEFAULT_STARS[star];
+    });
+    DEFAULT_STARS['Overall Rating'] = 0;
+    DEFAULT_STARS.Safety = 0;
+    DEFAULT_STARS.Efficacy = 0;
     this.stars = DEFAULT_STARS;
+
+    this.forceUpdate();
   }
 
   addRating() {
@@ -212,7 +243,7 @@ ReviewForm.propTypes = {
 };
 
 ReviewForm.defaultProps = {
-  stars: DEFAULT_STARS,
+  stars: Object.assign({}, DEFAULT_STARS),
   review: '',
 };
 

@@ -15,9 +15,11 @@ import {
   REVIEW_UPDATE_ACTION,
   REVIEW_DELETE_ACTION,
   GET_REVIEW_ACTION,
+  WRITE_REVIEW_ACTION,
 } from './constants';
 import { makeSelectWikiOverride } from './selectors';
 import {
+  clearReviewAction,
   defaultAction,
   trackingAction,
   descriptiveAction,
@@ -216,6 +218,17 @@ export function* getReviewSaga() {
   yield cancel(watcher);
 }
 
+export function* writeReview(action) {
+  browserHistory.push(`/review/${action.nctId}`);
+}
+
+export function* writeReviewSaga() {
+  const watcher = yield takeEvery(WRITE_REVIEW_ACTION, writeReview);
+  yield put(clearReviewAction());
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 
 export default [
   reloadStudySaga,
@@ -228,4 +241,5 @@ export default [
   deleteReviewSaga,
   updateReviewSaga,
   getReviewSaga,
+  writeReviewSaga,
 ];

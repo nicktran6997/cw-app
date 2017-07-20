@@ -17,6 +17,7 @@ import {
   REVIEW_RECEIVE_ACTION,
   WIKI_ACTION,
   SET_WIKI_OVERRIDE_ACTION,
+  CLEAR_REVIEW_ACTION,
 } from './constants';
 
 const initialState = fromJS({
@@ -37,6 +38,8 @@ function studyReducer(state = initialState, action) {
       return state.set('administrative', action.data);
     case RECRUITMENT_ACTION:
       return state.set('recruitment', action.data);
+    case CLEAR_REVIEW_ACTION:
+      return state.set('review', {});
     case REVIEWS_RECEIVE_ACTION:
       return state.set('reviews', action.data);
     case REVIEW_RECEIVE_ACTION:

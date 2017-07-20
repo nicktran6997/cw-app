@@ -37,7 +37,7 @@ const StudySidenav = (props) => (
           </Button>
           <Button
             onClick={props.loggedIn
-              ? () => props.router.push(`/review/${props.nct_id}`)
+              ? () => props.writeReview(props.nct_id)
               : () => props.onAnonymousClick()
             }
           >
@@ -101,6 +101,7 @@ StudySidenav.propTypes = {
   loggedIn: PropTypes.bool,
   onAnonymousClick: PropTypes.func,
   router: PropTypes.object,
+  writeReview: PropTypes.func,
   wikiOverride: PropTypes.bool,
   onWikiOverride: PropTypes.func,
 };

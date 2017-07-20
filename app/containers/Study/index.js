@@ -7,7 +7,7 @@ import AuthButton from '../../components/AuthButton';
 import StudySidenav from '../../components/StudySidenav';
 import CrowdTab from '../../components/CrowdTab';
 import StudyTab from '../../components/StudyTab';
-import ReviewForm from '../../components/ReviewForm';
+import ReviewForm, { DEFAULT_STARS } from '../../components/ReviewForm';
 import ReviewList from '../../components/ReviewList';
 import WikiTab from '../../components/WikiTab';
 import LoginModal from '../../containers/LoginSignup/LoginModal';
@@ -108,19 +108,24 @@ export class Study extends React.Component {
 
   getMainView() {
     if (this.props.location.pathname.match(/\/review\//)) {
-      let review;
-      let stars;
+      let review = '';
+      let stars = null;
       let reviewId = null;
       if (this.props.Study.review) {
-        review = this.props.Study.review.text;
-        if (this.props.Study.review.stars) {
-          stars = this.props.Study.review.stars;
-        } else if (this.props.Study.review.rating) {
-          stars = {
-            'Overall Rating': this.props.Study.review.rating,
-          };
-        }
         reviewId = this.props.Study.review.id;
+        if (reviewId) {
+          review = this.props.Study.review.text;
+          if (this.props.Study.review.stars) {
+            stars = this.props.Study.review.stars;
+          } else if (this.props.Study.review.rating) {
+            stars = {
+              'Overall Rating': this.props.Study.review.rating,
+            };
+          }
+        }
+      }
+      if (!stars) {
+        stars = DEFAULT_STARS;
       }
       return (
         <ReviewForm
@@ -191,6 +196,7 @@ export class Study extends React.Component {
             onAnonymousClick={this.props.onAnonymousClick}
             wikiOverride={this.props.wikiOverride}
             onWikiOverride={this.props.onWikiOverride}
+            writeReview={this.props.writeReview}
           />
           <Col md={9} id="study-main">
             <Row>
@@ -233,6 +239,7 @@ Study.propTypes = {
   WikiMeta: PropTypes.object,
   wikiOverride: PropTypes.bool,
   onWikiOverride: PropTypes.func,
+  writeReview: PropTypes.func,
 };
 
 Study.defaultProps = {
@@ -263,6 +270,7 @@ function mapDispatchToProps(dispatch) {
     onAnnotationRemove: (nctId, key) => dispatch(actions.deleteAnnotationAction(nctId, key)),
     onAnnotationUpdate: (nctId, key, value) => dispatch(actions.updateAnnotationAction(nctId, key, value)),
     onAnnotationCreate: (nctId, key, value) => dispatch(actions.createAnnotationAction(nctId, key, value)),
+    writeReview: (nctId) => dispatch(actions.writeReviewAction(nctId)),
   };
 }
 

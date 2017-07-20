@@ -26,6 +26,8 @@ import {
   WIKI_ACTION,
   WIKI_SUBMIT_ACTION,
   SET_WIKI_OVERRIDE_ACTION,
+  WRITE_REVIEW_ACTION,
+  CLEAR_REVIEW_ACTION,
 } from './constants';
 
 export const onWikiOverrideAction = (nctId, shouldOverride) => ({
@@ -151,4 +153,13 @@ export const deleteReviewAction = (nctId, reviewId) => ({
   type: REVIEW_DELETE_ACTION,
   nctId,
   reviewId,
+});
+
+export const writeReviewAction = (nctId) => ({
+  type: WRITE_REVIEW_ACTION,
+  nctId,
+});
+
+export const clearReviewAction = () => ({
+  type: CLEAR_REVIEW_ACTION,
 });
