@@ -45,6 +45,14 @@ class WikiTab extends React.Component { // eslint-disable-line react/prefer-stat
     markdownValue: CREATE_WIKI,
   }
 
+  componentWillMount() {
+    if (this.props.wiki && this.props.wiki.text) {
+      this.setState({
+        value: RichTextEditor.createValueFromString(this.props.wiki.text, 'markdown'),
+      });
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.wiki.exists && this.props.wiki.text !== nextProps.wiki.text) {
       this.setState({
