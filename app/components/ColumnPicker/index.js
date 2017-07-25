@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-import { Grid, Row, Col, Checkbox } from 'react-bootstrap';
+import { Grid, Row, Col, Checkbox, Button } from 'react-bootstrap';
 import Modal from 'react-modal';
 
 // cruft from immutable
@@ -16,11 +16,11 @@ function ColumnPicker(props) {
       contentLabel="Choose Your Columns"
       style={{
         overlay: {
-          zIndex: 2,
+          zIndex: 200,
           margin: '0 auto',
         },
         content: {
-          zIndex: 2,
+          zIndex: 200,
           margin: '0 auto',
         },
       }}
@@ -38,6 +38,13 @@ function ColumnPicker(props) {
               </Checkbox>
             </Col>
           ))}
+        </Row>
+        <Row>
+          <Col md={12} className="text-right">
+            <Button bsSize="large" onClick={props.onRequestClose}>
+              Close
+            </Button>
+          </Col>
         </Row>
       </Grid>
     </Modal>
