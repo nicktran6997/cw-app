@@ -12,7 +12,22 @@ import {
   TOGGLE_SORT_ACTION,
   QUERY_CHANGE_ACTION,
   AGG_BUCKETS_RECEIVED_ACTION,
+  TOGGLE_COLUMN_PICKER_ACTION,
+  PICK_COLUMN_ACTION,
 } from './constants';
+
+export const toggleColumnPickerAction = (dispatch) =>
+  () =>
+    dispatch({
+      type: TOGGLE_COLUMN_PICKER_ACTION,
+    });
+
+export const pickColumnAction = (dispatch) =>
+  (column) =>
+    dispatch({
+      type: PICK_COLUMN_ACTION,
+      column,
+    });
 
 export const searchAction = (dispatch) =>
   (params) => {

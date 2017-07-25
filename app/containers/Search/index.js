@@ -1,15 +1,9 @@
-/*
- *
- * Search
- *
- */
-
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ReactStars from 'react-stars';
 import ReactPaginate from 'react-paginate';
-import { Table, Column, Cell } from 'fixed-data-table';
+import { Table, Column, Cell } from 'fixed-data-table-2';
 import { Row, Col, Form, FormGroup, Label,
   FormControl, Button } from 'react-bootstrap';
 import Helmet from 'react-helmet';
@@ -18,6 +12,7 @@ import { createStructuredSelector } from 'reselect';
 import aggToField from '../../utils/aggToField';
 import SearchWrapper from '../../components/SearchWrapper';
 import AuthButton from '../../components/AuthButton';
+import ColumnPicker from '../../components/ColumnPicker';
 import AggDropdownGroup from '../../components/AggDropdownGroup';
 import { makeSelectAuthState } from '../App/selectors';
 import makeSelectSearch from './selectors';
@@ -61,10 +56,10 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     theProps.search(actions.getSearchParams(theProps, query));
   }
 
-  cellForField(field) {
+  cellForField(field, opts = {}) {
     return ({ rowIndex, ...props }) => (
       <Cell {...props} className="text-center">
-        {this.cellInner(field, this.props.Search.rows[rowIndex])}
+        {this.cellInner(field, this.props.Search.rows[rowIndex], opts)}
       </Cell>
     );
   }
@@ -88,8 +83,8 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     }
   }
 
-  cellInner(field, row) {
-    switch (field) {
+  cellInner(field, row, opts = {}) {
+    switch (opts.render) {
       case 'rating':
         return (
           <ReactStars
@@ -98,8 +93,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
             value={row[field]}
           />
         );
-      case 'nct_id':
-      case 'title':
+      case 'link':
         return <Link to={`/study/${row.nct_id}`}>{row[field]}</Link>;
       default:
         return row[field];
@@ -145,6 +139,80 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
     );
   }
 
+  // this is needed because fixed data table was a bad choice
+  // it doesn't respect rendering, so i can't even wrap it
+  renderColumns() {
+    const columns = [];
+    if (this.props.Search.columns.nctId) {
+      columns.push(
+        <Column
+          key="nctId"
+          header={this.headerCell('nct_id')}
+          cell={this.cellForField('nct_id', { render: 'link' })}
+          width={125}
+        />
+      );
+    }
+    /* eslint-disable react/prop-types */
+    if (this.props.Search.aggs &&
+        this.props.Search.aggs.rating_dimensions &&
+        this.props.Search.aggs.rating_dimensions.buckets) {
+      this.props.Search.aggs.rating_dimensions.buckets.forEach((bucket) => {
+        if (this.props.Search.columns[bucket.key]) {
+          columns.push(
+            <Column
+              key={bucket.key}
+              header={this.headerCell(bucket.key, bucket.key)}
+              cell={this.cellForField(bucket.key, { render: 'rating' })}
+              width={100}
+            />
+          );
+        }
+      });
+    }
+    if (this.props.Search.columns.status) {
+      columns.push(
+        <Column
+          key="status"
+          header={this.headerCell('status', 'overall_status')}
+          cell={this.cellForField('status')}
+          width={150}
+        />
+      );
+    }
+    if (this.props.Search.columns.title) {
+      columns.push(
+        <Column
+          key="title"
+          header={this.headerCell('title', 'brief_title')}
+          cell={this.cellForField('title', { render: 'link' })}
+          width={555}
+        />
+      );
+    }
+    if (this.props.Search.columns.started) {
+      columns.push(
+        <Column
+          key="started"
+          header={this.headerCell('started', 'start_date')}
+          cell={this.cellForField('started')}
+          width={105}
+        />
+      );
+    }
+    if (this.props.Search.columns.completed) {
+      columns.push(
+        <Column
+          key="completed"
+          header={this.headerCell('completed', 'completion_date')}
+          cell={this.cellForField('completed')}
+          width={105}
+        />
+      );
+    }
+    return columns;
+  }
+
   render() {
     return (
       <SearchWrapper id="search-wrapper">
@@ -188,6 +256,19 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
                     {' '}
                     <FontAwesome name="search" />
                   </Button>
+                  <Button
+                    style={{ marginLeft: '5px' }}
+                    title="Choose Columns..."
+                    onClick={this.props.toggleColumnPickerAction}
+                  >
+                    <FontAwesome name="table" /> ...
+                  </Button>
+                  <ColumnPicker
+                    columns={this.props.Search.columns}
+                    isOpen={this.props.Search.columnPickerOpen}
+                    onRequestClose={this.props.toggleColumnPickerAction}
+                    onPickColumn={this.props.pickColumnAction}
+                  />
                 </Form>
               </Col>
             </Row>
@@ -225,36 +306,7 @@ export class Search extends React.Component { // eslint-disable-line react/prefe
               width={1140}
               headerHeight={50}
             >
-              <Column
-                header={this.headerCell('nct_id')}
-                cell={this.cellForField('nct_id')}
-                width={125}
-              />
-              <Column
-                header={this.headerCell('rating', 'average_rating')}
-                cell={this.cellForField('rating')}
-                width={100}
-              />
-              <Column
-                header={this.headerCell('status', 'overall_status')}
-                cell={this.cellForField('status')}
-                width={150}
-              />
-              <Column
-                header={this.headerCell('title', 'brief_title')}
-                cell={this.cellForField('title')}
-                width={555}
-              />
-              <Column
-                header={this.headerCell('started', 'start_date')}
-                cell={this.cellForField('started')}
-                width={105}
-              />
-              <Column
-                header={this.headerCell('completed', 'completion_date')}
-                cell={this.cellForField('completed')}
-                width={105}
-              />
+              {this.renderColumns()}
             </Table>
           </Col>
         </Row>
@@ -288,6 +340,8 @@ Search.propTypes = {
   onQueryChange: PropTypes.func.isRequired,
   onAggRemoved: PropTypes.func.isRequired,
   onAggViewed: PropTypes.func.isRequired,
+  toggleColumnPickerAction: PropTypes.func.isRequired,
+  pickColumnAction: PropTypes.func.isRequired,
   pageLength: PropTypes.number,
   router: PropTypes.object,
   Auth: PropTypes.object,
@@ -299,11 +353,14 @@ Search.propTypes = {
     aggsSent: PropTypes.shape({}),
     sorts: PropTypes.shape({}),
     rows: PropTypes.arrayOf(PropTypes.shape({})),
+    columnPickerOpen: PropTypes.bool,
+    columns: PropTypes.object,
   }),
 };
 
 Search.defaultProps = {
   query: '',
+  columnPickerOpen: false,
   pageLength: 25,
   Search: {
     total: 0,
@@ -328,6 +385,8 @@ function mapDispatchToProps(dispatch) {
     onAggRemoved: actions.removeAggAction(dispatch),
     onToggleSort: actions.toggleSortAction(dispatch),
     onQueryChange: actions.queryChangeAction(dispatch),
+    toggleColumnPickerAction: actions.toggleColumnPickerAction(dispatch),
+    pickColumnAction: actions.pickColumnAction(dispatch),
   };
 }
 

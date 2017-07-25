@@ -1,9 +1,3 @@
-/*
- *
- * Search reducer
- *
- */
-
 import { fromJS } from 'immutable';
 import {
   SEARCH_ACTION,
@@ -13,6 +7,8 @@ import {
   TOGGLE_SORT_ACTION,
   QUERY_CHANGE_ACTION,
   AGG_BUCKETS_RECEIVED_ACTION,
+  TOGGLE_COLUMN_PICKER_ACTION,
+  PICK_COLUMN_ACTION,
 } from './constants';
 
 const initialState = fromJS({
@@ -23,10 +19,22 @@ const initialState = fromJS({
   aggs: {},
   query: '',
   prevQuery: '',
+  columns: {
+    nctId: true,
+    'Overall Rating': true,
+    status: true,
+    title: true,
+    started: true,
+    completed: true,
+  },
 });
 
 function searchReducer(state = initialState, action) {
   switch (action.type) {
+    case PICK_COLUMN_ACTION:
+      return state.updateIn(['columns', action.column], (x) => !x);
+    case TOGGLE_COLUMN_PICKER_ACTION:
+      return state.update('columnPickerOpen', (x) => !x);
     case SEARCH_ACTION:
       return state
         .set('query', action.data.query)
@@ -35,7 +43,16 @@ function searchReducer(state = initialState, action) {
         .set('total', action.data.recordsTotal)
         .set('totalFiltered', action.data.recordsFiltered)
         .set('rows', action.data.data)
-        .set('aggs', action.data.aggs);
+        .set('aggs', action.data.aggs)
+        .update('columns', (cols) => {
+          const origCols = (cols.toJS && cols.toJS()) || cols;
+          const newCols = Object.assign({}, origCols);
+          action.data.aggs.rating_dimensions.buckets.forEach((b) => {
+            newCols[b.key] = cols[b.key] || false;
+          });
+          // if we actually have settings, override them
+          return fromJS(Object.assign(newCols, origCols));
+        });
     case PAGE_CHANGE_ACTION:
       return state.set('page', action.data.selected);
     case AGG_SELECTED_ACTION:
