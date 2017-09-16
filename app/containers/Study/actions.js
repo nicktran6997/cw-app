@@ -28,6 +28,7 @@ import {
   SET_WIKI_OVERRIDE_ACTION,
   WRITE_REVIEW_ACTION,
   CLEAR_REVIEW_ACTION,
+  STUDY_LOAD_ERROR_ACTION,
 } from './constants';
 
 export const onWikiOverrideAction = (nctId, shouldOverride) => ({
@@ -162,4 +163,9 @@ export const writeReviewAction = (nctId) => ({
 
 export const clearReviewAction = () => ({
   type: CLEAR_REVIEW_ACTION,
+});
+
+export const studyLoadErrorAction = (error) => ({
+  type: STUDY_LOAD_ERROR_ACTION,
+  error,
 });
