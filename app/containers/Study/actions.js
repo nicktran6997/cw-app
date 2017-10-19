@@ -7,6 +7,7 @@ import {
   DEFAULT_ACTION,
   CROWD_ACTION,
   TRACKING_ACTION,
+  SITES_ACTION,
   DESCRIPTIVE_ACTION,
   ADMINISTRATIVE_ACTION,
   RECRUITMENT_ACTION,
@@ -90,6 +91,11 @@ export const crowdAction = (data) => ({
 
 export const trackingAction = (data) => ({
   type: TRACKING_ACTION,
+  data,
+});
+
+export const sitesAction = (data) => ({
+  type: SITES_ACTION,
   data,
 });
 

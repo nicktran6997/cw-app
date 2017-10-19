@@ -17,7 +17,7 @@ import makeSelectStudy, { makeSelectWiki, makeSelectWikiMeta, makeSelectWikiOver
 import * as actions from './actions';
 
 const defaultTabs = [
-  'wiki', 'crowd', 'descriptive', 'administrative', 'recruitment', 'tracking',
+  'wiki', 'crowd', 'descriptive', 'administrative', 'recruitment', 'tracking', 'sites',
 ];
 
 export class Study extends React.Component {
