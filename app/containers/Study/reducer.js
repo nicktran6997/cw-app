@@ -10,6 +10,7 @@ import {
   DEFAULT_ACTION,
   CROWD_ACTION,
   TRACKING_ACTION,
+  SITES_ACTION,
   DESCRIPTIVE_ACTION,
   ADMINISTRATIVE_ACTION,
   RECRUITMENT_ACTION,
@@ -32,6 +33,8 @@ function studyReducer(state = initialState, action) {
       return state.set('crowd', action.data);
     case TRACKING_ACTION:
       return state.set('tracking', action.data);
+    case SITES_ACTION:
+      return state.set('sites', action.data);
     case DESCRIPTIVE_ACTION:
       return state.set('descriptive', action.data);
     case ADMINISTRATIVE_ACTION:

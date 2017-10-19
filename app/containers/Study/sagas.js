@@ -22,6 +22,7 @@ import {
   clearReviewAction,
   defaultAction,
   trackingAction,
+  sitesAction,
   descriptiveAction,
   adminAction,
   recruitmentAction,
@@ -43,6 +44,10 @@ export function* loadTracking(action) {
   yield put(trackingAction(data.data));
 }
 
+export function* loadSites(action) {
+  const data = yield client.get(`/studies/${action.nctId}/sites`);
+  yield put(sitesAction(data.data));
+}
 export function* loadDescriptive(action) {
   const data = yield client.get(`/studies/${action.nctId}/descriptive`);
   yield put(descriptiveAction(data.data));
@@ -77,6 +82,9 @@ export function* loadStudy(action) {
   } catch (e) { studyLoadErrorAction(e); }
   try {
     yield call(loadTracking, action);
+  } catch (e) { studyLoadErrorAction(e); }
+  try {
+    yield call(loadSites, action);
   } catch (e) { studyLoadErrorAction(e); }
   try {
     yield call(loadDescriptive, action);
