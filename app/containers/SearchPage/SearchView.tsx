@@ -251,6 +251,7 @@ const SearchWrapper = styled.div`
 
 interface SearchViewProps {
   params: SearchParams;
+
   onUpdateParams: (updater: (params: SearchParams) => SearchParams) => void;
   onAggsUpdate: (
     aggs: { [key: string]: SearchPageSearchQuery_search_aggs_buckets[] },
@@ -260,9 +261,11 @@ interface SearchViewProps {
   onResetFilters: () => void;
   onOpenAgg: (name: string, kind: AggKind) => void;
   openedAgg: { name: string; kind: AggKind } | null;
+
 }
 
 class SearchView extends React.PureComponent<SearchViewProps> {
+
   isStarColumn = (name: string): boolean => {
     return name === 'average_rating';
   };
@@ -363,6 +366,13 @@ class SearchView extends React.PureComponent<SearchViewProps> {
     const idSortedLens = lensProp('id');
     const camelizedSorts = map(over(idSortedLens, camelCase), sorts);
     return (
+      <div>
+      <CSVLink data={path(['search', 'studies'], data)}
+               filename="data.csv"
+               target="_blank">
+         Export to CSV
+        </CSVLink>
+
       <SiteProvider>
         {site => (
           <ReactTable
@@ -394,6 +404,7 @@ class SearchView extends React.PureComponent<SearchViewProps> {
           />
         )}
       </SiteProvider>
+      </div>
     );
   };
 
@@ -455,29 +466,28 @@ class SearchView extends React.PureComponent<SearchViewProps> {
       />
     );
   };
-  renderExport = ({
-    data,
-    loading,
-    error,
-  }: {
-    data: SearchPageSearchQuery | undefined;
-    loading: boolean;
-    error: any;
-  }) => {
-    const header = ['NCT_id', 'Average Rating', 'Brief Title', 'Completion Status', 'Start Date', 'End Date'];
-    const csvData = [header];
+//   renderExport = ({
+//     data,
+//     loading,
+//     error,
+//   }: {
+//     data: SearchPageSearchQuery | undefined;
+//     loading: boolean;
+//     error: any;
+//   }) => {
+//     const header = ['NCT_id', 'Average Rating', 'Brief Title', 'Completion Status', 'Start Date', 'End Date'];
 
-    if (data) {
-      const csvData = path(['search', 'studies'], data);
-    } 
-    // ["firstname", "lastname", "email"],
-    // ["Ahmed", "Tomi", "ah@smthing.co.com"],
-    // ["Raed", "Labes", "rl@smthing.co.com"],
-    // ["Yezzi", "Min l3b", "ymin@cocococo.com"]
+//     //csvData = site=>{return site.siteView.search.fields}
+//     // ["firstname", "lastname", "email"],
+//     // ["Ahmed", "Tomi", "ah@smthing.co.com"],
+//     // ["Raed", "Labes", "rl@smthing.co.com"],
+//     // ["Yezzi", "Min l3b", "ymin@cocococo.com"]
 
-    return (<CSVLink data={csvData}>Download me</CSVLink>
-      );
-  }
+//     return (<SiteProvider>
+//       {site => (
+// )}
+//       </SiteProvider>);
+//   }
   render() {
     const { page, pageSize, sorts } = this.props.params;
 
@@ -500,7 +510,6 @@ class SearchView extends React.PureComponent<SearchViewProps> {
               <Grid>
                 <Row>
                   <Col md={12}>
-                    {this.renderExport({ data, loading, error })}
                     {this.renderCrumbs({ data, loading, error })}
                     {this.renderSearch({ data, loading, error })}
                   </Col>
