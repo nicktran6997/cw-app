@@ -44,7 +44,7 @@ import Aggs from './components/Aggs';
 import CrumbsBar from './components/CrumbsBar';
 import SiteProvider from 'containers/SiteProvider';
 import { studyFields, starColor } from 'utils/constants';
-
+import { CSVLink } from 'react-csv/lib';
 
 
 import { StudyPageQuery, StudyPageQueryVariables } from 'types/StudyPageQuery';
@@ -455,7 +455,29 @@ class SearchView extends React.PureComponent<SearchViewProps> {
       />
     );
   };
+  renderExport = ({
+    data,
+    loading,
+    error,
+  }: {
+    data: SearchPageSearchQuery | undefined;
+    loading: boolean;
+    error: any;
+  }) => {
+    const header = ['NCT_id', 'Average Rating', 'Brief Title', 'Completion Status', 'Start Date', 'End Date'];
+    const csvData = [header];
 
+    if (data) {
+      const csvData = path(['search', 'studies'], data);
+    } 
+    // ["firstname", "lastname", "email"],
+    // ["Ahmed", "Tomi", "ah@smthing.co.com"],
+    // ["Raed", "Labes", "rl@smthing.co.com"],
+    // ["Yezzi", "Min l3b", "ymin@cocococo.com"]
+
+    return (<CSVLink data={csvData}>Download me</CSVLink>
+      );
+  }
   render() {
     const { page, pageSize, sorts } = this.props.params;
 
@@ -474,9 +496,11 @@ class SearchView extends React.PureComponent<SearchViewProps> {
               );
             }
             return (
+
               <Grid>
                 <Row>
                   <Col md={12}>
+                    {this.renderExport({ data, loading, error })}
                     {this.renderCrumbs({ data, loading, error })}
                     {this.renderSearch({ data, loading, error })}
                   </Col>
