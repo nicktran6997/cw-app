@@ -223,10 +223,22 @@ const changeFilter = (add: boolean) => (
 };
 const addFilter = changeFilter(true);
 const removeFilter = changeFilter(false);
-const addSearchTerm = (term: string) => (params: SearchParams) => ({
-  ...params,
-  q: { ...params.q, children: [...(params.q.children || []), { key: term }] },
-});
+const addSearchTerm = (term: string) => (params: SearchParams) => {
+  // have to check for empty string because if you press return two times it ends up putting it in the terms
+  if (!term.replace(/\s/g, '').length) {
+    return params;
+  }
+  // recycled code for removing repeated terms. might be a better way but I'm not sure.
+  const children = reject(
+    propEq('key', term),
+    params.q.children || [],
+  );
+  return {
+    ...params,
+    q: { ...params.q, children: [...(children || []), { key: term }] },
+    page: 0,
+  };
+};
 const removeSearchTerm = (term: string) => (params: SearchParams) => {
   const children = reject(
     propEq('key', term),

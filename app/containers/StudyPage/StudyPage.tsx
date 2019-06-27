@@ -48,6 +48,7 @@ import { SiteViewFragment } from 'types/SiteViewFragment';
 import SitesPage from 'containers/SitesPage';
 import { SiteStudyBasicGenericSectionFragment } from 'types/SiteStudyBasicGenericSectionFragment';
 import { SiteStudyExtendedGenericSectionFragment } from 'types/SiteStudyExtendedGenericSectionFragment';
+
 interface StudyPageProps {
   history: History;
   location: Location;
@@ -438,7 +439,19 @@ class StudyPage extends React.Component<StudyPageProps, StudyPageState> {
   };
 
   renderReviewsSummary = (data: StudyPageQuery | undefined) => {
-    if (!data || !data.study) return null;
+    if (!data || !data.study) {
+      return <ReviewsWrapper>
+        <div>
+          <ReactStars
+            count={5}
+            color2={starColor}
+            edit={false}
+            value={0}
+          />
+          <div>{'0 Reviews'}</div>
+        </div>
+      </ReviewsWrapper>;
+    }
     return (
       <ReviewsWrapper>
         <div>
