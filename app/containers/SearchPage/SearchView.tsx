@@ -45,7 +45,6 @@ import CrumbsBar from './components/CrumbsBar';
 import SiteProvider from 'containers/SiteProvider';
 import { studyFields, starColor } from 'utils/constants';
 import { CSVLink } from 'react-csv/lib';
-
 import { StudyPageQuery, StudyPageQueryVariables } from 'types/StudyPageQuery';
 import { stringify } from 'querystring';
 
