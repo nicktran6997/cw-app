@@ -6,8 +6,10 @@ import { SuggestionsQuery } from 'types/SuggestionsQuery';
 import { path, pathOr, test, is, map } from 'ramda';
 
 const QUERY = gql`
-  query SuggestionsQuery($params: String) {
-    typeahead(params: $params)
+  query SuggestionsQuery($prefix: String) {
+    autosuggest(prefix: $prefix) {
+      word
+    }
   }
 `;
 
@@ -16,7 +18,7 @@ class SuggestionsQueryComponent extends Query<
   > {}
 
 interface SuggestionsProps {
-  params: String;
+  prefix: String;
 }
 interface SuggestionsState {
   isLoading: boolean;
@@ -36,6 +38,8 @@ class AutoSuggester extends React.Component<SuggestionsProps, SuggestionsState> 
       {client => this.renderMain(client)}
     </ApolloConsumer>)
   }
+  eachPath = arrayData => path(['word'], arrayData);
+
 
   onSearch = async (query: string, client:ApolloClient<any>) => {
 
@@ -44,12 +48,16 @@ class AutoSuggester extends React.Component<SuggestionsProps, SuggestionsState> 
     const {data}: any = await client.query({
       query: QUERY, 
       variables: {
-        params: query
+        prefix: query
       }
     });
-    console.log(data.typeahead)
+    const autoSuggestData: any = path(['autosuggest'], data);
+    let wordList: [] | null | undefined | any = null;
+    wordList = map(this.eachPath, autoSuggestData);
+
+
     this.setState({
-      options: data.typeahead,
+      options: wordList,
       isLoading: false
     });
   };
