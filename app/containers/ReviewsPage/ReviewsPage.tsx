@@ -30,8 +30,8 @@ import { reject, propEq, over, lensPath, keys } from 'ramda';
 import { dataIdFromObject } from 'configureApollo';
 import CurrentUser from 'containers/CurrentUser';
 import { UserFragment } from 'types/UserFragment';
-import { starColor } from 'utils/constants';
 import { SiteStudyBasicGenericSectionFragment } from 'types/SiteStudyBasicGenericSectionFragment';
+import { starColor } from 'utils/constants';
 
 interface ReviewsPageProps {
   match: match<{ nctId: string }>;

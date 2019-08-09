@@ -15,6 +15,7 @@ import aggToField from 'utils/aggs/aggToField';
 import MultiCrumb from 'components/MultiCrumb';
 import {Typeahead} from 'react-bootstrap-typeahead'; // ES2015
 import AutoSuggester from './AutoSuggester';
+
 const CrumbsBarStyleWrappper = styled.div`
   .crumbs-bar {
     padding: 10px 30px;

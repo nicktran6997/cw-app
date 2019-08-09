@@ -43,8 +43,7 @@ import 'react-table/react-table.css';
 import Aggs from './components/Aggs';
 import CrumbsBar from './components/CrumbsBar';
 import SiteProvider from 'containers/SiteProvider';
-import {studyFields, starColor, MAX_WINDOW_SIZE} from 'utils/constants';
-
+import { studyFields, starColor, MAX_WINDOW_SIZE } from 'utils/constants';
 import { StudyPageQuery, StudyPageQueryVariables } from 'types/StudyPageQuery';
 import { stringify } from 'querystring';
 
@@ -309,7 +308,6 @@ class SearchView extends React.PureComponent<SearchViewProps> {
     const upperCaseSpacing = 10;
     const maxWidth = 400;
     const totalPadding = 17;
-
     const getColumnWidth = () => {
       if (data.length < 1) {
         return calcWidth(headerName.split('')) + totalPadding;
@@ -325,8 +323,8 @@ class SearchView extends React.PureComponent<SearchViewProps> {
         }
       }
       const maxArray = max.split('');
-      max = Math.max(calcWidth(maxArray), calcWidth(headerName.split('')) + totalPadding);
-      return Math.min(maxWidth, max);
+      let maxSize = Math.max(calcWidth(maxArray), calcWidth(headerName.split('')) + totalPadding);
+      return Math.min(maxWidth, maxSize);
     };
 
     const calcWidth = array => {
