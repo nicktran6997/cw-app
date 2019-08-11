@@ -15,7 +15,7 @@ import aggToField from 'utils/aggs/aggToField';
 import MultiCrumb from 'components/MultiCrumb';
 import { MAX_WINDOW_SIZE } from '../../../utils/constants';
 import { PulseLoader } from 'react-spinners';
-
+import {map} from 'ramda';
 const CrumbsBarStyleWrappper = styled.div`
   .crumbs-bar {
     padding: 10px 30px;
@@ -193,6 +193,33 @@ export default class CrumbsBar extends React.Component<
     this.setState({ searchTerm: '' });
   };
 
+  makeSepCrumbs = (crumbsArray) => {
+
+    // console.log(crumbsArray.props.values);
+    // if (crumbsArray.props.values.length > 1) {
+
+    // }
+
+    return (<Row>
+            <Col md={12} style={{ padding: '10px 0px' }}>
+              <b>Filters: </b>
+              {crumbsArray}
+            </Col>
+          </Row>
+)
+  }
+
+  calcWidth = array => {
+      const lowerCaseSpacing = 8;
+      const upperCaseSpacing = 10;
+      array.push(' ', 'x', ' ')
+      return array.reduce(((acc, letter) =>
+                        letter === letter.toUpperCase() && letter !== ' ' ?
+                          acc + upperCaseSpacing : acc + lowerCaseSpacing),
+                          0);
+    };
+
+
   render() {
     return (
       <CrumbsBarStyleWrappper>
@@ -269,14 +296,12 @@ export default class CrumbsBar extends React.Component<
             </div>
           </Col>
         </Row> */}
-          <Row>
-            <Col md={12} style={{ padding: '10px 0px' }}>
-              <b>Filters: </b>
-              {Array.from(
+        {
+          console.log(this.props.searchParams.q.map(x=>this.calcWidth(x.split(''))))
+        }
+        {this.makeSepCrumbs(Array.from(
                 this.mkCrumbs(this.props.searchParams, this.props.removeFilter),
-              )}
-            </Col>
-          </Row>
+              ))}
         </Grid>
       </CrumbsBarStyleWrappper>
     );
