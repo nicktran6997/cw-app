@@ -132,12 +132,21 @@ export default class CrumbsBar extends React.Component<
     if (!isEmpty(searchParams.q)) {
       yield (
         <MultiCrumb
-          key="Search"
-          category="search"
-          values={searchParams.q}
+          key="Search 0 1"
+          category="search1"
+          values={searchParams.q.slice(0, 2)}
           onClick={term => this.props.removeSearchTerm(term)}
         />
       );
+      yield (
+        <MultiCrumb
+          key="Search 2 3"
+          category="search2"
+          values={searchParams.q.slice(2, 3)}
+          onClick={term => this.props.removeSearchTerm(term)}
+        />
+      );
+
     }
     for (const key in searchParams.aggFilters) {
       const agg = searchParams.aggFilters[key];
@@ -219,7 +228,26 @@ export default class CrumbsBar extends React.Component<
                           0);
     };
 
+  sizes() {
+    const sizes = this.props.searchParams.q.map(x=>this.calcWidth(x.split('')));
+    const add = (a, b) => a + b;
+    var sizeTotal = 0;
+    const maxSize = 1496;
+    let indices: number[] = [];
+    for (var i = 0; i < sizes.length; i ++) {
+      if (sizeTotal + sizes[i] > maxSize) {
+        indices.push(i);
+        sizeTotal = 0;
+      }
+      sizeTotal += sizes[i];
 
+    }
+    return (this.makeSepCrumbs(Array.from(
+                this.mkCrumbs(this.props.searchParams, this.props.removeFilter),
+              )))
+
+    //console.log(sizes.slice(0, indices[0]))
+  }
   render() {
     return (
       <CrumbsBarStyleWrappper>
@@ -297,7 +325,7 @@ export default class CrumbsBar extends React.Component<
           </Col>
         </Row> */}
         {
-          console.log(this.props.searchParams.q.map(x=>this.calcWidth(x.split(''))))
+          this.sizes()
         }
         {this.makeSepCrumbs(Array.from(
                 this.mkCrumbs(this.props.searchParams, this.props.removeFilter),
