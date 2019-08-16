@@ -74,6 +74,7 @@ const CrumbsBarStyleWrappper = styled.div`
       b:last-of-type {
         padding-right: 0px;
       }
+
     }
   }
   .right-align {
@@ -87,6 +88,7 @@ const CrumbsBarStyleWrappper = styled.div`
   .searchInput {
     padding-bottom: 10px;
   }
+
 `;
 
 import { AggCallback, SearchParams } from '../Types';
@@ -129,28 +131,43 @@ export default class CrumbsBar extends React.Component<
   CrumbsBarState
 > {
   *mkCrumbs(searchParams: SearchParams, removeFilter) {
+    const indices = this.sizes();
     if (!isEmpty(searchParams.q)) {
-      yield (
-        <MultiCrumb
-          key="Search 0 1"
-          category="search1"
-          values={searchParams.q.slice(0, 2)}
-          onClick={term => this.props.removeSearchTerm(term)}
-        />
-      );
-      yield (
-        <MultiCrumb
-          key="Search 2 3"
-          category="search2"
-          values={searchParams.q.slice(2, 3)}
-          onClick={term => this.props.removeSearchTerm(term)}
-        />
-      );
+      for (let i = 0; i < indices.length; i++) {
+        if (i === 0) {
+          yield(
+            <MultiCrumb
+              key = {"Search"}
+              category = 'Search'
+              values = {searchParams.q.slice(i, indices[0])}
+              onClick={term => this.props.removeSearchTerm(term)}
+          />
+          )
+
+        }
+        else {
+          yield (
+            <div key = {'Search'.concat(i.toString())}>
+              <br/>
+
+            <MultiCrumb
+              key = {"Search"}
+              category = ''
+              values = {searchParams.q.slice(indices[i-1], indices[i])}
+              onClick={term => this.props.removeSearchTerm(term)}
+
+            />
+            </div>
+            )
+
+        }
+      }
 
     }
     for (const key in searchParams.aggFilters) {
       const agg = searchParams.aggFilters[key];
       const cat = aggToField(agg.field);
+
       yield (
         <MultiCrumb
           category={cat}
@@ -182,7 +199,7 @@ export default class CrumbsBar extends React.Component<
           bsSize="small"
           key="reset"
           onClick={this.props.onReset}
-          style={{ marginLeft: '10px' }}
+          style={{ marginLeft: '10px', marginTop: '10px' }}
         >
           Reset
         </Button>
@@ -208,6 +225,7 @@ export default class CrumbsBar extends React.Component<
     // if (crumbsArray.props.values.length > 1) {
 
     // }
+   // const first = i === 1 ? <b> Filters:</b> : null;
 
     return (<Row>
             <Col md={12} style={{ padding: '10px 0px' }}>
@@ -240,11 +258,12 @@ export default class CrumbsBar extends React.Component<
         sizeTotal = 0;
       }
       sizeTotal += sizes[i];
-
     }
-    return (this.makeSepCrumbs(Array.from(
-                this.mkCrumbs(this.props.searchParams, this.props.removeFilter),
-              )))
+    indices.push(sizes.length);
+    return indices;
+    // return (this.makeSepCrumbs(Array.from(
+    //             this.mkCrumbs(this.props.searchParams, this.props.removeFilter),
+    //           ), 2))
 
     //console.log(sizes.slice(0, indices[0]))
   }
@@ -324,12 +343,15 @@ export default class CrumbsBar extends React.Component<
             </div>
           </Col>
         </Row> */}
-        {
-          this.sizes()
-        }
-        {this.makeSepCrumbs(Array.from(
+        <Row>
+            <Col md={12} style={{ padding: '10px 0px' }}>
+              <b>Filters: </b>
+              {Array.from(
                 this.mkCrumbs(this.props.searchParams, this.props.removeFilter),
-              ))}
+              )}
+            </Col>
+          </Row>
+
         </Grid>
       </CrumbsBarStyleWrappper>
     );
