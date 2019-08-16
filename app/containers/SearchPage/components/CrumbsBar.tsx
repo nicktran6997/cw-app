@@ -196,7 +196,6 @@ export default class CrumbsBar extends React.Component<
     for (const key in searchParams.aggFilters) {
       const agg = searchParams.aggFilters[key];
       const cat = aggToField(agg.field);
-
       yield (
         <MultiCrumb
           category={cat}
@@ -228,7 +227,7 @@ export default class CrumbsBar extends React.Component<
           bsSize="small"
           key="reset"
           onClick={this.props.onReset}
-          style={{ marginLeft: '10px'}}
+          style={{ marginLeft: '10px' }}
         >
           Reset
         </Button>
