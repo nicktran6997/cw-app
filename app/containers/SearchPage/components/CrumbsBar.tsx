@@ -130,37 +130,42 @@ export default class CrumbsBar extends React.Component<
   CrumbsBarState
 > {
   *mkCrumbs(searchParams: SearchParams, removeFilter) {
-    const indices =  () => {
-      //calculates indices of words array where I should make a line break
-      const calcWidth = (array) => {
-        //helper func to calc width of all words in SearchParams.q
-        const lowerCaseSpacing = 8;
-        const upperCaseSpacing = 10;
-        array.push(' ', 'x', ' ')
-        return array.reduce(((acc, letter) =>
-                          letter === letter.toUpperCase() && letter !== ' ' ?
-                            acc + upperCaseSpacing : acc + lowerCaseSpacing),
-                            0);
+    if (!isEmpty(searchParams.q)) {
+      const calcIndices = () => {
+        //calculates indices of words array where I should make a line break
+        const calcWidth = (array) => {
+          //helper func to calc width of one word in SearchParams array
+
+          //uppercase and lowercase words have diff spaces
+          const lowerCaseSpacing = 8;
+          const upperCaseSpacing = 10;
+
+          //accounting for filter x)
+          array.push(' ', 'x', ' ')
+          return array.reduce(((acc, letter) =>
+                            letter === letter.toUpperCase() && letter !== ' ' ?
+                              acc + upperCaseSpacing : acc + lowerCaseSpacing),
+                              0);
+        };
+
+        const sizes = this.props.searchParams.q.map(x=>calcWidth(x.split('')));
+        var sizeTotal = 0;
+        const maxSize = 1496;
+        let indices: number[] = [];
+        for (var i = 0; i < sizes.length; i ++) {
+          if (sizeTotal + sizes[i] > maxSize) {
+            indices.push(i);
+            sizeTotal = 0;
+          }
+          sizeTotal += sizes[i];
+        }
+        //Always push last entry so we would render all words
+        indices.push(sizes.length);
+        return indices;
       };
 
-      const sizes = this.props.searchParams.q.map(x=>calcWidth(x.split('')));
-      var sizeTotal = 0;
-      const maxSize = 1496;
-      let indices: number[] = [];
-      for (var i = 0; i < sizes.length; i ++) {
-        if (sizeTotal + sizes[i] > maxSize) {
-          indices.push(i);
-          sizeTotal = 0;
-        }
-        sizeTotal += sizes[i];
-      }
-      //Always push last entry so we would render all words
-      indices.push(sizes.length);
-      return indices;
-    };
-
-    if (!isEmpty(searchParams.q)) {
       //not sure if div is the most optimal wrapper but it works fine as is.
+      const indices = calcIndices();
       for (let i = 0; i < indices.length; i++) {
         if (i === 0) {
           yield(
@@ -224,7 +229,7 @@ export default class CrumbsBar extends React.Component<
           bsSize="small"
           key="reset"
           onClick={this.props.onReset}
-          style={{ marginLeft: '10px', marginTop: '10px' }}
+          style={{ marginLeft: '10px', }}
         >
           Reset
         </Button>
