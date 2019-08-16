@@ -15,7 +15,6 @@ import aggToField from 'utils/aggs/aggToField';
 import MultiCrumb from 'components/MultiCrumb';
 import { MAX_WINDOW_SIZE } from '../../../utils/constants';
 import { PulseLoader } from 'react-spinners';
-import {map} from 'ramda';
 const CrumbsBarStyleWrappper = styled.div`
   .crumbs-bar {
     padding: 10px 30px;
@@ -133,6 +132,7 @@ export default class CrumbsBar extends React.Component<
   *mkCrumbs(searchParams: SearchParams, removeFilter) {
     const indices = this.sizes();
     if (!isEmpty(searchParams.q)) {
+      //not sure if div is the most optimal wrapper but it works fine as is.
       for (let i = 0; i < indices.length; i++) {
         if (i === 0) {
           yield(
@@ -219,22 +219,6 @@ export default class CrumbsBar extends React.Component<
     this.setState({ searchTerm: '' });
   };
 
-  makeSepCrumbs = (crumbsArray) => {
-
-    // console.log(crumbsArray.props.values);
-    // if (crumbsArray.props.values.length > 1) {
-
-    // }
-   // const first = i === 1 ? <b> Filters:</b> : null;
-
-    return (<Row>
-            <Col md={12} style={{ padding: '10px 0px' }}>
-              <b>Filters: </b>
-              {crumbsArray}
-            </Col>
-          </Row>
-)
-  }
 
   calcWidth = array => {
       const lowerCaseSpacing = 8;
