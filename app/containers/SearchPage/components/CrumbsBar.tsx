@@ -15,6 +15,7 @@ import aggToField from 'utils/aggs/aggToField';
 import MultiCrumb from 'components/MultiCrumb';
 import { MAX_WINDOW_SIZE } from '../../../utils/constants';
 import { PulseLoader } from 'react-spinners';
+
 const CrumbsBarStyleWrappper = styled.div`
   .crumbs-bar {
     padding: 10px 30px;
@@ -73,7 +74,6 @@ const CrumbsBarStyleWrappper = styled.div`
       b:last-of-type {
         padding-right: 0px;
       }
-
     }
   }
   .right-align {
@@ -87,7 +87,6 @@ const CrumbsBarStyleWrappper = styled.div`
   .searchInput {
     padding-bottom: 10px;
   }
-
 `;
 
 import { AggCallback, SearchParams } from '../Types';
@@ -229,7 +228,7 @@ export default class CrumbsBar extends React.Component<
           bsSize="small"
           key="reset"
           onClick={this.props.onReset}
-          style={{ marginLeft: '10px', }}
+          style={{ marginLeft: '10px'}}
         >
           Reset
         </Button>
@@ -248,8 +247,6 @@ export default class CrumbsBar extends React.Component<
     this.props.addSearchTerm(this.state.searchTerm);
     this.setState({ searchTerm: '' });
   };
-
-
 
   render() {
     return (
@@ -327,7 +324,7 @@ export default class CrumbsBar extends React.Component<
             </div>
           </Col>
         </Row> */}
-        <Row>
+          <Row>
             <Col md={12} style={{ padding: '10px 0px' }}>
               <b>Filters: </b>
               {Array.from(
@@ -335,7 +332,6 @@ export default class CrumbsBar extends React.Component<
               )}
             </Col>
           </Row>
-
         </Grid>
       </CrumbsBarStyleWrappper>
     );
