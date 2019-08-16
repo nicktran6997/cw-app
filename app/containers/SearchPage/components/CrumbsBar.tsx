@@ -130,7 +130,35 @@ export default class CrumbsBar extends React.Component<
   CrumbsBarState
 > {
   *mkCrumbs(searchParams: SearchParams, removeFilter) {
-    const indices = this.sizes();
+    const indices =  () => {
+      //calculates indices of words array where I should make a line break
+      const calcWidth = (array) => {
+        //helper func to calc width of all words in SearchParams.q
+        const lowerCaseSpacing = 8;
+        const upperCaseSpacing = 10;
+        array.push(' ', 'x', ' ')
+        return array.reduce(((acc, letter) =>
+                          letter === letter.toUpperCase() && letter !== ' ' ?
+                            acc + upperCaseSpacing : acc + lowerCaseSpacing),
+                            0);
+      };
+
+      const sizes = this.props.searchParams.q.map(x=>calcWidth(x.split('')));
+      var sizeTotal = 0;
+      const maxSize = 1496;
+      let indices: number[] = [];
+      for (var i = 0; i < sizes.length; i ++) {
+        if (sizeTotal + sizes[i] > maxSize) {
+          indices.push(i);
+          sizeTotal = 0;
+        }
+        sizeTotal += sizes[i];
+      }
+      //Always push last entry so we would render all words
+      indices.push(sizes.length);
+      return indices;
+    };
+
     if (!isEmpty(searchParams.q)) {
       //not sure if div is the most optimal wrapper but it works fine as is.
       for (let i = 0; i < indices.length; i++) {
@@ -142,27 +170,24 @@ export default class CrumbsBar extends React.Component<
               values = {searchParams.q.slice(i, indices[0])}
               onClick={term => this.props.removeSearchTerm(term)}
           />
-          )
-
+          );
         }
+
         else {
           yield (
             <div key = {'Search'.concat(i.toString())}>
               <br/>
+              <MultiCrumb
+                key = {"Search"}
+                category = ''
+                values = {searchParams.q.slice(indices[i-1], indices[i])}
+                onClick={term => this.props.removeSearchTerm(term)}
 
-            <MultiCrumb
-              key = {"Search"}
-              category = ''
-              values = {searchParams.q.slice(indices[i-1], indices[i])}
-              onClick={term => this.props.removeSearchTerm(term)}
-
-            />
+              />
             </div>
-            )
-
+            );
         }
       }
-
     }
     for (const key in searchParams.aggFilters) {
       const agg = searchParams.aggFilters[key];
@@ -220,37 +245,7 @@ export default class CrumbsBar extends React.Component<
   };
 
 
-  calcWidth = array => {
-      const lowerCaseSpacing = 8;
-      const upperCaseSpacing = 10;
-      array.push(' ', 'x', ' ')
-      return array.reduce(((acc, letter) =>
-                        letter === letter.toUpperCase() && letter !== ' ' ?
-                          acc + upperCaseSpacing : acc + lowerCaseSpacing),
-                          0);
-    };
 
-  sizes() {
-    const sizes = this.props.searchParams.q.map(x=>this.calcWidth(x.split('')));
-    const add = (a, b) => a + b;
-    var sizeTotal = 0;
-    const maxSize = 1496;
-    let indices: number[] = [];
-    for (var i = 0; i < sizes.length; i ++) {
-      if (sizeTotal + sizes[i] > maxSize) {
-        indices.push(i);
-        sizeTotal = 0;
-      }
-      sizeTotal += sizes[i];
-    }
-    indices.push(sizes.length);
-    return indices;
-    // return (this.makeSepCrumbs(Array.from(
-    //             this.mkCrumbs(this.props.searchParams, this.props.removeFilter),
-    //           ), 2))
-
-    //console.log(sizes.slice(0, indices[0]))
-  }
   render() {
     return (
       <CrumbsBarStyleWrappper>
