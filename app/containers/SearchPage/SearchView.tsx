@@ -545,6 +545,7 @@ class SearchView extends React.PureComponent<SearchViewProps> {
     const records = path(['search', 'studies'], data)
     return (<CSVLink data = {records}
                      filename="data.csv"
+                     className = 'btn btn-primary'
                      target="_blank">
                      Export to CSV
             </CSVLink>)
@@ -561,7 +562,21 @@ class SearchView extends React.PureComponent<SearchViewProps> {
           <title>Search</title>
           <meta name="description" content="Description of SearchPage" />
         </Helmet>
-        <QueryComponent query={QUERY} variables={variables}>
+
+        <QueryComponent query={QUERY} variables={this.props.params}>
+          {({ data, loading, error }) => {
+            if (data && data.search) {
+              this.props.onAggsUpdate(
+                this.transformAggs(data.search.aggs || []),
+                this.transformCrowdAggs(data.crowdAggs.aggs || []),
+              );
+            }
+            return (
+              <Grid>
+                <Row>
+                  <Col md={12}>
+                    {this.renderCrumbs({ data, loading, error })}
+                            <QueryComponent query={QUERY} variables={variables}>
           {({ data, loading, error }) => {
             if (data && data.search) {
               this.props.onAggsUpdate(
@@ -581,19 +596,6 @@ class SearchView extends React.PureComponent<SearchViewProps> {
           }}
         </QueryComponent>
 
-        <QueryComponent query={QUERY} variables={this.props.params}>
-          {({ data, loading, error }) => {
-            if (data && data.search) {
-              this.props.onAggsUpdate(
-                this.transformAggs(data.search.aggs || []),
-                this.transformCrowdAggs(data.crowdAggs.aggs || []),
-              );
-            }
-            return (
-              <Grid>
-                <Row>
-                  <Col md={12}>
-                    {this.renderCrumbs({ data, loading, error })}
                     {this.renderSearch({ data, loading, error })}
                   </Col>
                 </Row>
