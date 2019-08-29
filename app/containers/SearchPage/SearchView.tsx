@@ -356,7 +356,7 @@ class SearchView extends React.PureComponent<SearchViewProps> {
           <div id="divsononeline">
             &nbsp;({props.original.reviewsCount})</div>
           </div>),
-       width: getColumnWidth(),
+      width: getColumnWidth(),
 
     };
   };
@@ -433,13 +433,13 @@ class SearchView extends React.PureComponent<SearchViewProps> {
     return (
       <SiteProvider>
         {site => {
-         const columns = map(x => this.renderColumn(x, searchData), site.siteView.search.fields);
-         const totalWidth = columns.reduce(((acc, col)=> acc+col.width), 0);
-         const leftover = tableWidth-totalWidth;
-         const additionalWidth=leftover/columns.length;
-         columns.map(x=>x.width+= additionalWidth, columns);
+          const columns = map(x => this.renderColumn(x, searchData), site.siteView.search.fields);
+          const totalWidth = columns.reduce(((acc, col)=> acc+col.width), 0);
+          const leftover = tableWidth-totalWidth;
+          const additionalWidth=leftover/columns.length;
+          columns.map(x=>x.width+= additionalWidth, columns);
 
-         return (
+          return (
            <ReactTable
              className="-striped -highlight"
              columns={columns}
@@ -542,19 +542,20 @@ class SearchView extends React.PureComponent<SearchViewProps> {
   }) => {
     if (loading || !data) return null;
     if (error) return <div>{error.message}</div>; 
-    const records = path(['search', 'studies'], data)
+    // const { page, pageSize, sorts } = this.props.params;
+    const records = path(['search', 'studies'], data);
     return (<CSVLink data = {records}
-                     filename="data.csv"
-                     className = 'btn btn-primary'
-                     target="_blank">
+                     filename="cwiki-trials.csv"
+                     className = "btn btn-primary"
+                     target="_blank"
+                     >
                      Export to CSV
-            </CSVLink>)
-    }
-
+            </CSVLink>);
+  }
 
   render() {
     const { page, pageSize, sorts } = this.props.params;
-    let variables = JSON.parse(JSON.stringify(this.props.params));
+    const variables = JSON.parse(JSON.stringify(this.props.params));
     variables.pageSize = 10000;
     return (
       <SearchWrapper>
