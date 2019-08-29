@@ -46,6 +46,7 @@ import SiteProvider from 'containers/SiteProvider';
 import {studyFields, starColor, MAX_WINDOW_SIZE} from 'utils/constants';
 import { StudyPageQuery, StudyPageQueryVariables } from 'types/StudyPageQuery';
 import { stringify } from 'querystring';
+import { CSVLink } from 'react-csv/lib';
 
 const QUERY = gql`
   query SearchPageSearchQuery(
@@ -530,14 +531,56 @@ class SearchView extends React.PureComponent<SearchViewProps> {
     );
   };
 
+  renderExport = ({
+    data,
+    loading,
+    error,
+  }: {
+    data: SearchPageSearchQuery | undefined;
+    loading: boolean;
+    error: any;
+  }) => {
+    if (loading || !data) return null;
+    if (error) return <div>{error.message}</div>; 
+    const records = path(['search', 'studies'], data)
+    return (<CSVLink data = {records}
+                     filename="data.csv"
+                     target="_blank">
+                     Export to CSV
+            </CSVLink>)
+    }
+
+
   render() {
     const { page, pageSize, sorts } = this.props.params;
+    let variables = JSON.parse(JSON.stringify(this.props.params));
+    variables.pageSize = 10000;
     return (
       <SearchWrapper>
         <Helmet>
           <title>Search</title>
           <meta name="description" content="Description of SearchPage" />
         </Helmet>
+        <QueryComponent query={QUERY} variables={variables}>
+          {({ data, loading, error }) => {
+            if (data && data.search) {
+              this.props.onAggsUpdate(
+                this.transformAggs(data.search.aggs || []),
+                this.transformCrowdAggs(data.crowdAggs.aggs || []),
+              );
+            }
+            return (
+              <Grid>
+                <Row>
+                  <Col md={12}>
+                     {this.renderExport({data, loading, error})}
+                  </Col>
+                </Row>
+              </Grid>
+            );
+          }}
+        </QueryComponent>
+
         <QueryComponent query={QUERY} variables={this.props.params}>
           {({ data, loading, error }) => {
             if (data && data.search) {
@@ -558,6 +601,8 @@ class SearchView extends React.PureComponent<SearchViewProps> {
             );
           }}
         </QueryComponent>
+
+
       </SearchWrapper>
     );
   }
