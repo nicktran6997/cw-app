@@ -6,6 +6,8 @@ import { History } from 'history';
 import { Navbar } from 'react-bootstrap';
 
 import AuthButton from 'components/AuthButton';
+
+import { GoogleLogin } from 'react-google-login';
 // import SearchInput from 'components/SearchInput';
 
 interface AuthHeaderProps {
@@ -39,6 +41,10 @@ const StyledWrapper = styled.div`
     color: #fff;
   }
 `;
+const responseGoogle = (response) => {
+  console.log(response);
+}
+
 
 export class AuthHeader extends React.PureComponent<AuthHeaderProps> {
   render() {
@@ -59,6 +65,15 @@ export class AuthHeader extends React.PureComponent<AuthHeaderProps> {
               )}
               <li>
                 <a href="/about">About</a>
+              </li>
+              <li>
+                <GoogleLogin
+                  clientId="1026109175880-sdbtteuq40vlhbo54m2o01mc8ai7ve1p.apps.googleusercontent.com"
+                  buttonText="Login"
+                  onSuccess={responseGoogle}
+                  onFailure={responseGoogle}
+                  cookiePolicy={'single_host_origin'}
+                />
               </li>
             </ul>
           </Navbar.Header>
